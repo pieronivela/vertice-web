@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>WATIO — Solicitar análisis de inversión solar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:     #0B1F3A;
+  --navy-mid: #122A4E;
+  --gold:     #B8963C;
+  --gold-pale:#F5EDD6;
+  --ivory:    #F7F5F0;
+  --white:    #FFFFFF;
+  --ink:      #0E0E0C;
+  --ink2:     #4A4A46;
+  --ink3:     #8A8A84;
+  --slate:    #8A9BB0;
+  --green:    #2E9E6B;
+  --red:      #B03A2E;
+  --amber:    #C17F24;
+  --border:   rgba(0,0,0,0.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--ivory);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* NAV */
+nav{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:54px;border-bottom:1px solid rgba(201,168,76,0.2);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:0.1px;}
+.nav-brand span{color:var(--gold);}
+.nav-back{font-size:12.5px;color:var(--slate);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;}
+.nav-back:hover{color:var(--gold);}
+
+/* HERO */
+.hero{background:var(--navy);padding:48px 5vw 40px;position:relative;}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,transparent 50%);}
+.hero-inner{max-width:680px;margin:0 auto;}
+.hero-eye{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;line-height:1.2;}
+.hero-sub{font-size:14px;color:var(--slate);line-height:1.65;max-width:500px;}
+
+/* PASOS */
+.steps-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 5vw;}
+.steps-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:0;}
+.step-item{display:flex;align-items:center;gap:8px;flex:1;}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;transition:all .2s;}
+.step-num.done{background:var(--green);color:#fff;}
+.step-num.active{background:var(--navy);color:var(--gold);}
+.step-num.pending{background:var(--border);color:var(--ink3);border:1px solid rgba(0,0,0,.12);}
+.step-label{font-size:12px;color:var(--ink2);font-weight:500;}
+.step-label.active{color:var(--ink);font-weight:600;}
+.step-label.pending{color:var(--ink3);}
+.step-divider{height:1px;flex:1;background:var(--border);margin:0 8px;}
+
+/* FORM SHELL */
+.form-shell{max-width:680px;margin:32px auto;padding:0 5vw 80px;}
+
+/* SECTION */
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px;}
+.form-section-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.form-section-title .icon{width:28px;height:28px;border-radius:7px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+
+/* FIELDS */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.field-row.single{grid-template-columns:1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:12px;font-weight:500;color:var(--ink2);}
+.field .req{color:var(--red);}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 13px;border:1px solid rgba(0,0,0,.12);border-radius:7px;
+  font-size:14px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);
+  transition:border-color .15s,box-shadow .15s;outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,31,58,0.08);
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink3);}
+.field textarea{resize:vertical;min-height:80px;}
+.field-hint{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.5;}
+
+/* PLAN SELECTOR */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+.plan-card{border:2px solid var(--border);border-radius:9px;padding:14px;cursor:pointer;transition:all .15s;position:relative;}
+.plan-card:hover{border-color:var(--navy);}
+.plan-card.selected{border-color:var(--navy);background:rgba(11,31,58,0.03);}
+.plan-card.selected.featured{border-color:var(--gold);background:var(--gold-pale);}
+.plan-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
+.plan-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;font-family:'Space Grotesk',sans-serif;}
+.plan-name{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.plan-price{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-1px;margin-bottom:4px;}
+.plan-price sup{font-size:12px;vertical-align:top;margin-top:5px;font-weight:500;}
+.plan-features{font-size:11px;color:var(--ink3);line-height:1.6;}
+.plan-card.selected .plan-name{color:var(--navy);}
+.plan-card.selected .plan-price{color:var(--navy);}
+
+/* UPLOAD */
+.upload-area{border:2px dashed rgba(0,0,0,.15);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--ivory);}
+.upload-area:hover,.upload-area.drag{border-color:var(--navy);background:rgba(11,31,58,0.03);}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.upload-sub{font-size:11.5px;color:var(--ink3);}
+.upload-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.upload-item{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12.5px;color:var(--ink);}
+.upload-item .file-icon{font-size:14px;flex-shrink:0;}
+.upload-item .file-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.upload-item .file-remove{font-size:16px;color:var(--ink3);cursor:pointer;flex-shrink:0;line-height:1;}
+.upload-item .file-remove:hover{color:var(--red);}
+
+/* NOTA DRIVE */
+.drive-note{background:rgba(46,158,107,0.08);border:1px solid rgba(46,158,107,0.2);border-radius:7px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-top:10px;}
+.drive-note p{font-size:12px;color:var(--ink2);line-height:1.6;}
+.drive-note strong{color:var(--green);}
+
+/* PRIVACY */
+.privacy-check{display:flex;gap:10px;align-items:flex-start;margin-top:4px;}
+.privacy-check input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--navy);}
+.privacy-check label{font-size:12px;color:var(--ink3);line-height:1.6;}
+.privacy-check a{color:var(--navy);}
+
+/* SUBMIT */
+.submit-area{margin-top:20px;}
+.btn-submit{width:100%;padding:15px;background:var(--navy);color:var(--gold);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;border:none;border-radius:9px;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:-0.2px;}
+.btn-submit:hover{opacity:.88;transform:translateY(-1px);}
+.btn-submit:active{transform:translateY(0);}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.submit-note{font-size:11.5px;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.6;}
+
+/* GARANTIAS */
+.garantias{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.garantia{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink3);}
+.garantia::before{content:'✓';color:var(--green);font-weight:700;}
+
+/* SUCCESS */
+.success-screen{display:none;max-width:680px;margin:48px auto;padding:0 5vw;text-align:center;}
+.success-icon{font-size:56px;margin-bottom:20px;}
+.success-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--ink);margin-bottom:12px;}
+.success-sub{font-size:15px;color:var(--ink2);line-height:1.7;max-width:460px;margin:0 auto 28px;}
+.success-ref{background:var(--navy);color:var(--gold);font-family:'Space Mono',monospace;font-size:13px;padding:10px 20px;border-radius:7px;display:inline-block;margin-bottom:28px;letter-spacing:.05em;}
+.success-steps{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:left;margin-bottom:24px;}
+.success-steps h4{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px;}
+.success-step{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+.success-step:last-child{border-bottom:none;}
+.ss-num{width:22px;height:22px;border-radius:50%;background:var(--navy);color:var(--gold);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ss-text{font-size:13px;color:var(--ink2);line-height:1.55;}
+.ss-text strong{color:var(--ink);}
+.btn-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;text-decoration:none;transition:opacity .15s;}
+.btn-wa:hover{opacity:.88;}
+
+/* RESPONSIVE */
+@media(max-width:520px){
+  .field-row{grid-template-columns:1fr;}
+  .plan-grid{grid-template-columns:1fr;}
+  .form-section{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/watio/" class="nav-logo">
+    <span class="nav-brand">VÉR<span>TICE</span> ANALÍTICA</span>
+  </a>
+  <a href="/watio/" class="nav-back">← Volver a WATIO</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eye">// solicitud de análisis · WATIO</div>
+    <h1>Complete su solicitud<br>de análisis solar</h1>
+    <p class="hero-sub">Sus datos se almacenan de forma segura en Google Drive. El informe se entrega en 48 horas al email indicado.</p>
+    <div id="precarga-banner" style="display:none;margin-top:14px;background:rgba(46,158,107,0.12);border:1px solid rgba(46,158,107,0.25);border-radius:7px;padding:10px 16px;font-size:12.5px;color:#E8F8F0;">
+      ✓ <strong>Datos pre-cargados desde su análisis</strong> — Revise y complete los campos antes de enviar.
+    </div>
+  </div>
+</div>
+
+<!-- PASOS -->
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step-item">
+      <div class="step-num active" id="sn1">1</div>
+      <span class="step-label active">Sus datos</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item">
+      <div class="step-num pending" id="sn2">2</div>
+      <span class="step-label pending">Plan y documentos</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item">
+      <div class="step-num pending" id="sn3">3</div>
+      <span class="step-label pending">Confirmación</span>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULARIO -->
+<div class="form-shell" id="form-shell">
+  <form id="watio-form" novalidate>
+
+    <!-- SECCIÓN 1: DATOS PERSONALES -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">👤</div>
+        Datos personales
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" id="f-nombre" placeholder="Ej. Juan Carlos Andrade" required>
+        </div>
+        <div class="field">
+          <label>Empresa / Razón social <span class="hint-label">(opcional)</span></label>
+          <input type="text" id="f-empresa" placeholder="Si aplica">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" id="f-email" placeholder="correo@ejemplo.com" required>
+          <span class="field-hint">Aquí se entregará el informe en PDF</span>
+        </div>
+        <div class="field">
+          <label>Teléfono / WhatsApp <span class="req">*</span></label>
+          <input type="tel" id="f-telefono" placeholder="+593 9X XXX XXXX" required>
+          <span class="field-hint">Para coordinación del análisis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: DATOS DE LA INSTALACIÓN -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">⚡</div>
+        Datos de su instalación
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Ciudad <span class="req">*</span></label>
+          <select id="f-ciudad" required>
+            <option value="">Seleccionar ciudad</option>
+            <option value="quito">Quito</option>
+            <option value="guayaquil">Guayaquil</option>
+            <option value="cuenca">Cuenca</option>
+            <option value="manta">Manta / Costa</option>
+            <option value="otra">Otra ciudad</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de instalación <span class="req">*</span></label>
+          <select id="f-tipo" required>
+            <option value="">Seleccionar tipo</option>
+            <option value="residencial">Residencial</option>
+            <option value="comercial">Comercial</option>
+            <option value="pyme">PYME / Empresa</option>
+            <option value="industrial">Industrial</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Factura mensual promedio ($) <span class="req">*</span></label>
+          <input type="number" id="f-factura" placeholder="Ej. 134.78" min="10" step="0.01" required>
+          <span class="field-hint">Monto total que paga a EEQ/CNEL por mes</span>
+        </div>
+        <div class="field">
+          <label>Consumo mensual (kWh) <span class="req">*</span></label>
+          <input type="number" id="f-kwh" placeholder="Ej. 1013" min="50" step="1" required>
+          <span class="field-hint">Aparece como "energía activa" en su planilla</span>
+        </div>
+      </div>
+
+      <div class="field-row single">
+        <div class="field">
+          <label>Forma de pago preferida</label>
+          <select id="f-pago">
+            <option value="contado">Al contado</option>
+            <option value="credito">Crédito bancario</option>
+            <option value="cfn">CFN / BanEcuador</option>
+            <option value="nodefinido">Aún no lo he definido</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row single">
+        <div class="field">
+          <label>Contexto adicional <span class="hint-label">(opcional)</span></label>
+          <textarea id="f-contexto" placeholder="Ej. Tengo una cotización de un instalador de $8.500. También tengo interés en saber si conviene financiar. Cuento con espacio en el techo de 40m²..."></textarea>
+          <span class="field-hint">Cualquier detalle que ayude a personalizar el análisis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: PLAN -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">📋</div>
+        Seleccione su plan
+      </div>
+
+      <div class="plan-grid">
+
+        <label class="plan-card" id="card-basico">
+          <input type="radio" name="plan" value="basico" id="plan-basico">
+          <div class="plan-name">Básico</div>
+          <div class="plan-price"><sup>$</sup>150</div>
+          <div class="plan-features">
+            Informe 2 páginas<br>
+            2 escenarios<br>
+            TIR · VAN · Payback<br>
+            Entrega en 72h
+          </div>
+        </label>
+
+        <label class="plan-card featured" id="card-estandar">
+          <div class="plan-badge">⭐ Recomendado</div>
+          <input type="radio" name="plan" value="estandar" id="plan-estandar" checked>
+          <div class="plan-name">Estándar</div>
+          <div class="plan-price"><sup>$</sup>250</div>
+          <div class="plan-features">
+            Todo lo del Básico<br>
+            Comparación 3 cotizaciones<br>
+            Llamada revisión 30 min<br>
+            Entrega en 48h
+          </div>
+        </label>
+
+        <label class="plan-card" id="card-premium">
+          <input type="radio" name="plan" value="premium" id="plan-premium">
+          <div class="plan-name">Premium</div>
+          <div class="plan-price"><sup>$</sup>380</div>
+          <div class="plan-features">
+            Todo lo del Estándar<br>
+            Estructuración financiamiento<br>
+            Seguimiento 3 meses<br>
+            Entrega en 48h
+          </div>
+        </label>
+
+      </div>
+      <div class="field-hint" style="margin-top:8px;text-align:center;">Puede cambiar de plan antes de confirmar el pago</div>
+    </div>
+
+    <!-- SECCIÓN 4: DOCUMENTOS -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">📎</div>
+        Documentos de soporte
+      </div>
+
+      <!-- Planillas eléctricas (3 meses) -->
+      <div class="field" style="margin-bottom:16px;">
+        <label>Planillas eléctricas — últimos 3 meses <span class="req">*</span></label>
+        <div class="upload-area" id="upload-planilla">
+          <input type="file" id="file-planilla" accept=".pdf,.jpg,.jpeg,.png,.heic"
+                 multiple onchange="handleFiles('planilla', this.files)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF, JPG o PNG · máx. 10 MB por archivo · 3 archivos requeridos</div>
+        </div>
+        <div class="upload-list" id="list-planilla"></div>
+        <span class="field-hint">Suba las 3 planillas más recientes (EEQ/CNEL). El análisis usa el promedio de los 3 meses para un resultado más preciso — un solo mes puede no reflejar su consumo real.</span>
+      </div>
+
+      <!-- Cotización instalador -->
+      <div class="field" style="margin-bottom:0;">
+        <label>Cotización del instalador <span class="hint-label">(opcional — Plan Estándar y Premium)</span></label>
+        <div class="upload-area" id="upload-cotizacion">
+          <input type="file" id="file-cotizacion" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls"
+                 multiple onchange="handleFiles('cotizacion', this.files)">
+          <div class="upload-icon">📋</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF, JPG, PNG o Excel · máx. 10 MB por archivo · hasta 3 archivos</div>
+        </div>
+        <div class="upload-list" id="list-cotizacion"></div>
+        <span class="field-hint">Si tiene cotizaciones de instaladores, el análisis validará si el precio por kWp es razonable.</span>
+      </div>
+
+      <!-- Nota Google Drive -->
+      <div class="drive-note">
+        <div style="font-size:20px;flex-shrink:0;">🔒</div>
+        <p><strong>Sus archivos se almacenan de forma segura.</strong> Todos los documentos se guardan en Google Drive bajo una carpeta privada con su número de referencia. Solo el equipo de WATIO tiene acceso. Sus datos no se comparten con terceros.</p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: PRIVACIDAD Y ENVÍO -->
+    <div class="form-section">
+      <div class="privacy-check">
+        <input type="checkbox" id="f-privacy" required>
+        <label for="f-privacy">
+          Autorizo a VÉRTICE ANALÍTICA a procesar mis datos personales y documentos para la elaboración del informe WATIO. Los datos se usarán exclusivamente para este fin y no serán compartidos con terceros. <a href="#">Política de privacidad</a>.
+        </label>
+      </div>
+
+      <div class="submit-area">
+        <button type="submit" class="btn-submit" id="btn-submit">
+          Enviar solicitud de análisis →
+        </button>
+        <p class="submit-note">
+          Recibirá una confirmación por email en los próximos 15 minutos.<br>
+          El informe se entrega en <strong>48 horas</strong> una vez confirmado el pago.
+        </p>
+      </div>
+
+      <div class="garantias">
+        <span class="garantia">Análisis independiente</span>
+        <span class="garantia">Sin comisión de instaladores</span>
+        <span class="garantia">Entrega garantizada 48h</span>
+        <span class="garantia">Actualización gratuita si precio difiere >15%</span>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- PANTALLA DE ÉXITO -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">✅</div>
+  <h2 class="success-title">¡Solicitud recibida!</h2>
+  <p class="success-sub">Sus datos y documentos han sido almacenados de forma segura. Complete el pago para iniciar el análisis.</p>
+  <div class="success-ref" id="success-ref">WATIO-2025-0044</div>
+
+  <!-- BLOQUE DE PAGO -->
+  <div style="background:var(--navy);border-radius:12px;padding:24px;margin-bottom:24px;text-align:left;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.04em;">Total a pagar</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:var(--gold);" id="pago-monto">$250</span>
+    </div>
+    <button class="btn-submit" style="margin-bottom:10px;" onclick="irAPago()">
+      💳 Pagar con tarjeta de crédito/débito
+    </button>
+    <p style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.5;">
+      Procesado de forma segura · Visa, Mastercard, Diners y Discover<br>
+      Powered by PayPhone
+    </p>
+  </div>
+
+  <div class="success-steps">
+    <h4>¿Qué pasa ahora?</h4>
+    <div class="success-step">
+      <div class="ss-num">1</div>
+      <div class="ss-text"><strong>Pago confirmado</strong> — Una vez procesado el pago con tarjeta, recibirá confirmación inmediata por email.</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">2</div>
+      <div class="ss-text"><strong>Análisis en proceso</strong> — Nuestro equipo inicia el análisis con el promedio de sus 3 planillas y datos reales.</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">3</div>
+      <div class="ss-text"><strong>Entrega del informe</strong> — Recibirá el PDF a <span id="success-email">su correo</span> en máximo <strong>48 horas</strong> con el análisis completo.</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">4</div>
+      <div class="ss-text"><strong>Llamada de revisión</strong> (Plan Estándar y Premium) — Le contactaremos para agendar la revisión del informe en 30 minutos.</div>
+    </div>
+  </div>
+
+  <a href="https://wa.me/593985365281" target="_blank" class="btn-wa">
+    💬 Prefiero coordinar por WhatsApp
+  </a>
+</div>
+
+<script>
+// ── PAGO CON TARJETA (PayPhone) ───────────────────────────────────
+async function irAPago() {
+  const ref     = document.getElementById('success-ref').textContent;
+  const plan    = window.__planSeleccionado || 'estandar';
+  const montos  = { basico: 150, estandar: 250, premium: 380 };
+  const monto   = montos[plan] || 250;
+  const email   = document.getElementById('f-email')?.value || window.__clienteEmail || '';
+  const nombre  = document.getElementById('f-nombre')?.value || window.__clienteNombre || '';
+  const telefono= document.getElementById('f-telefono')?.value || window.__clienteTelefono || '';
+
+  const btnPago = document.querySelector('.success-screen .btn-submit');
+  const textoOriginal = btnPago ? btnPago.textContent : '';
+  if (btnPago) { btnPago.disabled = true; btnPago.textContent = 'Conectando con PayPhone...'; }
+
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: new URLSearchParams({
+        accion: 'preparar_pago',
+        producto: 'watio',
+        ref, monto, email, nombre, telefono
+      })
+    });
+    const data = await resp.json();
+
+    if (data.success && data.urlPago) {
+      window.location.href = data.urlPago;
+    } else {
+      alert('No se pudo conectar con PayPhone. Por favor intente de nuevo o contáctenos por WhatsApp.\n\n' + (data.error || ''));
+      if (btnPago) { btnPago.disabled = false; btnPago.textContent = textoOriginal; }
+    }
+  } catch (err) {
+    alert('Hubo un error de conexión. Por favor intente de nuevo o contáctenos por WhatsApp.');
+    if (btnPago) { btnPago.disabled = false; btnPago.textContent = textoOriginal; }
+  }
+}
+
+// ── PRE-RELLENAR DESDE URL PARAMS ────────────────────────────────
+  function preRellenar() {
+    const p = new URLSearchParams(window.location.search);
+    
+    // Plan
+    const plan = p.get('plan');
+    if (plan && document.getElementById('plan-' + plan)) {
+      document.getElementById('plan-' + plan).checked = true;
+      document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+      const card = document.getElementById('card-' + plan);
+      if (card) card.classList.add('selected');
+    }
+
+    // Ciudad
+    if (p.get('ciudad')) {
+      document.getElementById('f-ciudad').value = p.get('ciudad');
+    }
+
+    // Tipo
+    if (p.get('tipo')) {
+      document.getElementById('f-tipo').value = p.get('tipo');
+    }
+
+    // Factura
+    if (p.get('factura')) {
+      document.getElementById('f-factura').value = parseFloat(p.get('factura')).toFixed(2);
+    }
+
+    // kWh
+    if (p.get('kwh')) {
+      document.getElementById('f-kwh').value = p.get('kwh');
+    }
+
+    // Contexto con datos de la calculadora
+    const tir = p.get('tir'); const payback = p.get('payback');
+    if (tir || payback) {
+      document.getElementById('f-contexto').value =
+        `Análisis previo en calculadora WATIO: TIR estimada ${tir}, Payback ${payback}.`;
+    }
+  }
+  preRellenar();
+  // Mostrar banner si hay datos de calculadora
+  if (window.location.search.includes('kwh=') || window.location.search.includes('factura=')) {
+    document.getElementById('precarga-banner').style.display = 'block';
+  }
+
+  // ── PLAN CARDS ─────────────────────────────────────────────────
+document.querySelectorAll('input[name="plan"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    this.closest('.plan-card').classList.add('selected');
+  });
+});
+// Marcar estándar por defecto
+document.getElementById('card-estandar').classList.add('selected');
+
+// ── FILE UPLOADS ───────────────────────────────────────────────
+const fileStores = { planilla: [], cotizacion: [] };
+
+function handleFiles(type, files) {
+  const maxFiles = type === 'cotizacion' ? 3 : 3;
+  const maxSize  = 10 * 1024 * 1024; // 10MB
+
+  Array.from(files).forEach(file => {
+    if (fileStores[type].length >= maxFiles) {
+      alert(`Máximo ${maxFiles} archivo(s) para este campo.`); return;
+    }
+    if (file.size > maxSize) {
+      alert(`El archivo "${file.name}" supera 10MB.`); return;
+    }
+    fileStores[type].push(file);
+  });
+  renderFileList(type);
+}
+
+function renderFileList(type) {
+  const list = document.getElementById('list-' + type);
+  list.innerHTML = '';
+  fileStores[type].forEach((file, idx) => {
+    const ext  = file.name.split('.').pop().toLowerCase();
+    const icon = ['pdf'].includes(ext) ? '📄' : ['jpg','jpeg','png','heic'].includes(ext) ? '🖼️' : '📊';
+    const div  = document.createElement('div');
+    div.className = 'upload-item';
+    div.innerHTML = `
+      <span class="file-icon">${icon}</span>
+      <span class="file-name">${file.name}</span>
+      <span class="file-size" style="font-size:11px;color:var(--ink3);white-space:nowrap;">${(file.size/1024/1024).toFixed(1)}MB</span>
+      <span class="file-remove" onclick="removeFile('${type}',${idx})" title="Eliminar">×</span>`;
+    list.appendChild(div);
+  });
+
+  // Indicador de progreso para planilla (requiere exactamente 3)
+  if (type === 'planilla') {
+    const count = fileStores.planilla.length;
+    const existing = document.getElementById('planilla-progress');
+    if (existing) existing.remove();
+    const prog = document.createElement('div');
+    prog.id = 'planilla-progress';
+    prog.style = `font-size:12px;font-weight:500;margin-top:8px;padding:6px 10px;border-radius:6px;display:inline-block;
+      background:${count===3?'rgba(46,158,107,0.1)':'rgba(184,150,60,0.1)'};
+      color:${count===3?'var(--green)':'var(--gold)'};`;
+    prog.textContent = count === 3
+      ? '✓ 3 de 3 planillas cargadas'
+      : `${count} de 3 planillas cargadas — faltan ${3-count}`;
+    list.parentElement.insertBefore(prog, list.nextSibling);
+  }
+}
+
+function removeFile(type, idx) {
+  fileStores[type].splice(idx, 1);
+  renderFileList(type);
+}
+
+// Drag & drop
+['planilla','cotizacion'].forEach(type => {
+  const area = document.getElementById('upload-' + type);
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag'); });
+  area.addEventListener('dragleave', () => area.classList.remove('drag'));
+  area.addEventListener('drop', e => {
+    e.preventDefault(); area.classList.remove('drag');
+    handleFiles(type, e.dataTransfer.files);
+  });
+});
+
+// ── VALIDACIÓN Y ENVÍO ─────────────────────────────────────────
+function generateRef() {
+  const n = Math.floor(1000 + Math.random() * 9000);
+  return `WATIO-2025-${n}`;
+}
+
+function validate() {
+  const required = ['f-nombre','f-email','f-telefono','f-ciudad','f-tipo','f-factura','f-kwh'];
+  let ok = true;
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.style.borderColor = 'var(--red)';
+      ok = false;
+    } else {
+      el.style.borderColor = '';
+    }
+  });
+  if (!document.getElementById('f-privacy').checked) {
+    alert('Debe aceptar la política de privacidad para continuar.');
+    ok = false;
+  }
+  if (fileStores.planilla.length < 3) {
+    alert(`Por favor adjunte las 3 planillas eléctricas requeridas (actualmente tiene ${fileStores.planilla.length} de 3).`);
+    ok = false;
+  }
+  return ok;
+}
+
+// ── URL DEL APPS SCRIPT — se configura en el paso de despliegue ──
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0p1D-LoAQWPELtPzMgURPmehzG9toz6iOcCsYu6RTPPknQm2AS7BcU16wXUB3ZKoK/exec';
+
+// Convierte un File a base64 (necesario para enviarlo en el POST)
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]); // quita el prefijo data:...;base64,
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function prepararArchivosParaEnvio() {
+  const archivos = {};
+  for (const tipo in fileStores) {
+    archivos[tipo] = [];
+    for (const file of fileStores[tipo]) {
+      const contenido = await fileToBase64(file);
+      archivos[tipo].push({
+        nombre: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        contenido: contenido
+      });
+    }
+  }
+  return archivos;
+}
+
+document.getElementById('watio-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!validate()) return;
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Subiendo documentos...';
+
+  const ref   = generateRef();
+  const email = document.getElementById('f-email').value;
+  const plan  = document.querySelector('input[name="plan"]:checked').value;
+  const nombre= document.getElementById('f-nombre').value;
+  const telefono = document.getElementById('f-telefono').value;
+  const ciudad   = document.getElementById('f-ciudad').value;
+  const tipo     = document.getElementById('f-tipo').value;
+  const factura  = document.getElementById('f-factura').value;
+  const kwh      = document.getElementById('f-kwh').value;
+  const contexto = document.getElementById('f-contexto').value;
+
+  // Preparar archivos en base64
+  let archivosListos = {};
+  try {
+    archivosListos = await prepararArchivosParaEnvio();
+  } catch (err) {
+    alert('Hubo un error preparando los documentos. Intente de nuevo.');
+    btn.disabled = false;
+    btn.textContent = 'Enviar solicitud de análisis →';
+    return;
+  }
+
+  btn.textContent = 'Enviando solicitud...';
+
+  const payload = {
+    producto: 'watio',
+    ref, nombre, email, telefono, plan,
+    ciudad, tipo, factura, kwh, contexto,
+    archivos: archivosListos
+  };
+
+  // Enviar al Apps Script
+  if (APPS_SCRIPT_URL.includes('PEGA_AQUI')) {
+    console.warn('⚠️ APPS_SCRIPT_URL no configurada — los datos NO se están guardando en Drive ni se envían emails.');
+  } else {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: new URLSearchParams({ payload: JSON.stringify(payload) })
+      });
+    } catch (err) {
+      console.error('Error enviando al backend:', err);
+      // Continuamos igual mostrando la confirmación al cliente,
+      // pero esto debería alertar a Piero de revisar manualmente.
+    }
+  }
+
+  // Mostrar pantalla de éxito
+  document.getElementById('form-shell').style.display = 'none';
+  document.getElementById('success-ref').textContent  = ref;
+  document.getElementById('success-email').textContent = email;
+  document.getElementById('success-screen').style.display = 'block';
+
+  // Guardar datos del cliente para usarlos luego en el pago con PayPhone
+  window.__clienteEmail = email;
+  window.__clienteNombre = nombre;
+  window.__clienteTelefono = telefono;
+
+  // Conectar plan seleccionado con el bloque de pago
+  const montosPlan = { basico: 150, estandar: 250, premium: 380 };
+  window.__planSeleccionado = plan;
+  document.getElementById('pago-monto').textContent = '$' + (montosPlan[plan] || 250);
+
+  // Actualizar pasos
+  ['sn1','sn2','sn3'].forEach(id => {
+    document.getElementById(id).className = 'step-num done';
+    document.getElementById(id).textContent = '✓';
+  });
+
+  // Abrir WhatsApp con resumen completo (como respaldo adicional al email)
+  const planLabel= {'basico':'Básico $150','estandar':'Estándar $250','premium':'Premium $380'}[plan];
+
+  const msg = `🌟 *Nueva solicitud WATIO*\n\n` +
+    `*Ref:* ${ref}\n` +
+    `*Nombre:* ${nombre}\n` +
+    `*Email:* ${email}\n` +
+    `*Plan:* ${planLabel}\n\n` +
+    `*Instalación:*\n` +
+    `· Ciudad: ${ciudad}\n` +
+    `· Tipo: ${tipo}\n` +
+    `· Factura: $${factura}/mes\n` +
+    `· Consumo: ${kwh} kWh/mes\n` +
+    (contexto ? `\n*Contexto:* ${contexto}\n` : '') +
+    `\n📁 Documentos subidos al Drive\n` +
+    `📋 Planillas (promedio 3 meses): ${fileStores.planilla.length} archivo(s)\n` +
+    `📋 Cotizaciones: ${fileStores.cotizacion.length} archivo(s)`;
+
+  setTimeout(() => {
+    window.open('https://wa.me/593985365281?text=' + encodeURIComponent(msg), '_blank');
+  }, 1000);
+});
+
+// Focus en errores
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', () => el.style.borderColor = '');
+});
+</script>
+</body>
+</html>

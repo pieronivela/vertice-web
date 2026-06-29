@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>BANKABLE — Solicitar diagnóstico crediticio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --navy:     #0B1F3A;
+  --navy-mid: #122A4E;
+  --gold:     #B8963C;
+  --gold-pale:#F5EDD6;
+  --ivory:    #F7F5F0;
+  --white:    #FFFFFF;
+  --ink:      #0E0E0C;
+  --ink2:     #4A4A46;
+  --ink3:     #8A8A84;
+  --slate:    #8A9BB0;
+  --green:    #2E9E6B;
+  --red:      #B03A2E;
+  --amber:    #C17F24;
+  --border:   rgba(0,0,0,0.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:var(--ivory);}
+body{font-family:'Inter',sans-serif;background:var(--ivory);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* NAV */
+nav{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:54px;border-bottom:1px solid rgba(184,150,60,0.2);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:0.1px;}
+.nav-brand span{color:var(--gold);}
+.nav-back{font-size:12.5px;color:var(--slate);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;}
+.nav-back:hover{color:var(--gold);}
+
+/* HERO */
+.hero{background:var(--navy);padding:48px 5vw 40px;position:relative;}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,transparent 50%);}
+.hero-inner{max-width:680px;margin:0 auto;}
+.hero-eye{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;line-height:1.2;}
+.hero-sub{font-size:14px;color:var(--slate);line-height:1.65;max-width:500px;}
+
+/* PASOS */
+.steps-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 5vw;}
+.steps-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:0;}
+.step-item{display:flex;align-items:center;gap:8px;flex:1;}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;transition:all .2s;}
+.step-num.done{background:var(--green);color:#fff;}
+.step-num.active{background:var(--navy);color:var(--gold);}
+.step-num.pending{background:var(--border);color:var(--ink3);border:1px solid rgba(0,0,0,.12);}
+.step-label{font-size:12px;color:var(--ink2);font-weight:500;}
+.step-label.active{color:var(--ink);font-weight:600;}
+.step-label.pending{color:var(--ink3);}
+.step-divider{height:1px;flex:1;background:var(--border);margin:0 8px;}
+
+/* FORM SHELL */
+.form-shell{max-width:680px;margin:32px auto;padding:0 5vw 80px;}
+
+/* SECTION */
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px;}
+.form-section-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.form-section-title .icon{width:28px;height:28px;border-radius:7px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+
+/* FIELDS */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.field-row.single{grid-template-columns:1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:12px;font-weight:500;color:var(--ink2);}
+.field .req{color:var(--red);}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 13px;border:1px solid rgba(0,0,0,.12);border-radius:7px;
+  font-size:14px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);
+  transition:border-color .15s,box-shadow .15s;outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,31,58,0.08);
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink3);}
+.field textarea{resize:vertical;min-height:80px;}
+.field-hint{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.5;}
+
+/* TABLA DINÁMICA */
+.dyn-table{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.dyn-row{background:var(--ivory);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.dyn-row-fields{display:flex;gap:10px;flex:1;flex-wrap:wrap;}
+.dyn-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px;}
+.dyn-field label{font-size:10.5px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.03em;}
+.dyn-field input,.dyn-field select{
+  padding:8px 10px;border:1px solid rgba(0,0,0,.12);border-radius:6px;
+  font-size:13px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s;
+}
+.dyn-field input:focus,.dyn-field select:focus{border-color:var(--navy);}
+.dyn-remove{
+  width:28px;height:28px;border-radius:6px;border:1px solid rgba(176,58,46,.25);
+  background:#FFF5F4;color:var(--red);font-size:16px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s;
+}
+.dyn-remove:hover{background:var(--red);color:#fff;}
+.dyn-empty{font-size:12.5px;color:var(--ink3);font-style:italic;padding:10px 4px;}
+.dyn-add-btn{
+  align-self:flex-start;margin-top:6px;padding:8px 16px;border-radius:7px;
+  border:1.5px dashed var(--navy);background:transparent;color:var(--navy);
+  font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:all .15s;
+}
+.dyn-add-btn:hover{background:rgba(11,31,58,0.05);}
+@media(max-width:520px){
+  .dyn-row{flex-direction:column;align-items:stretch;}
+  .dyn-remove{align-self:flex-end;}
+}
+
+/* PLAN SELECTOR */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+.plan-card{border:2px solid var(--border);border-radius:9px;padding:14px;cursor:pointer;transition:all .15s;position:relative;}
+.plan-card:hover{border-color:var(--navy);}
+.plan-card.selected{border-color:var(--navy);background:rgba(11,31,58,0.03);}
+.plan-card.selected.featured{border-color:var(--gold);background:var(--gold-pale);}
+.plan-card input[type=radio]{position:absolute;opacity:0;width:0;height:0;}
+.plan-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;font-family:'Space Grotesk',sans-serif;}
+.plan-name{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.plan-price{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-1px;margin-bottom:4px;}
+.plan-price sup{font-size:12px;vertical-align:top;margin-top:5px;font-weight:500;}
+.plan-features{font-size:11px;color:var(--ink3);line-height:1.6;}
+.plan-card.selected .plan-name{color:var(--navy);}
+.plan-card.selected .plan-price{color:var(--navy);}
+
+/* UPLOAD */
+.upload-area{border:2px dashed rgba(0,0,0,.15);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--ivory);}
+.upload-area:hover,.upload-area.drag{border-color:var(--navy);background:rgba(11,31,58,0.03);}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.upload-sub{font-size:11.5px;color:var(--ink3);}
+.upload-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.upload-item{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12.5px;color:var(--ink);}
+.upload-item .file-icon{font-size:14px;flex-shrink:0;}
+.upload-item .file-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.upload-item .file-remove{font-size:16px;color:var(--ink3);cursor:pointer;flex-shrink:0;line-height:1;}
+.upload-item .file-remove:hover{color:var(--red);}
+
+/* NOTA DRIVE */
+.drive-note{background:rgba(46,158,107,0.08);border:1px solid rgba(46,158,107,0.2);border-radius:7px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-top:10px;}
+.drive-note p{font-size:12px;color:var(--ink2);line-height:1.6;}
+.drive-note strong{color:var(--green);}
+
+/* PRIVACY */
+.privacy-check{display:flex;gap:10px;align-items:flex-start;margin-top:4px;}
+.privacy-check input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--navy);}
+.privacy-check label{font-size:12px;color:var(--ink3);line-height:1.6;}
+.privacy-check a{color:var(--navy);}
+
+/* SUBMIT */
+.submit-area{margin-top:20px;}
+.btn-submit{width:100%;padding:15px;background:var(--navy);color:var(--gold);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;border:none;border-radius:9px;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:-0.2px;}
+.btn-submit:hover{opacity:.88;transform:translateY(-1px);}
+.btn-submit:active{transform:translateY(0);}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.submit-note{font-size:11.5px;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.6;}
+
+/* GARANTIAS */
+.garantias{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.garantia{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink3);}
+.garantia::before{content:'✓';color:var(--green);font-weight:700;}
+
+/* SUCCESS */
+.success-screen{display:none;max-width:680px;margin:48px auto;padding:0 5vw;text-align:center;}
+.success-icon{font-size:56px;margin-bottom:20px;}
+.success-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--ink);margin-bottom:12px;}
+.success-sub{font-size:15px;color:var(--ink2);line-height:1.7;max-width:460px;margin:0 auto 28px;}
+.success-ref{background:var(--navy);color:var(--gold);font-family:'Space Mono',monospace;font-size:13px;padding:10px 20px;border-radius:7px;display:inline-block;margin-bottom:28px;letter-spacing:.05em;}
+.success-steps{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:left;margin-bottom:24px;}
+.success-steps h4{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:14px;}
+.success-step{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+.success-step:last-child{border-bottom:none;}
+.ss-num{width:22px;height:22px;border-radius:50%;background:var(--navy);color:var(--gold);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ss-text{font-size:13px;color:var(--ink2);line-height:1.55;}
+.ss-text strong{color:var(--ink);}
+.btn-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;text-decoration:none;transition:opacity .15s;}
+.btn-wa:hover{opacity:.88;}
+
+/* RESPONSIVE */
+@media(max-width:520px){
+  .field-row{grid-template-columns:1fr;}
+  .plan-grid{grid-template-columns:1fr;}
+  .form-section{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/bankable/" class="nav-logo">
+    <span class="nav-brand">VÉR<span>TICE</span> ANALÍTICA</span>
+  </a>
+  <a href="/bankable/" class="nav-back">← Volver a BANKABLE</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eye">// solicitud de diagnóstico · BANKABLE</div>
+    <h1>Complete su solicitud<br>de diagnóstico crediticio</h1>
+    <p class="hero-sub">Sus datos y documentos se almacenan de forma segura en Google Drive. El informe se entrega en 72 horas al email indicado.</p>
+  </div>
+</div>
+
+<!-- PASOS -->
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step-item">
+      <div class="step-num active" id="sn1">1</div>
+      <span class="step-label active">Sus datos</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item">
+      <div class="step-num pending" id="sn2">2</div>
+      <span class="step-label pending">Plan y documentos</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item">
+      <div class="step-num pending" id="sn3">3</div>
+      <span class="step-label pending">Pago y confirmación</span>
+    </div>
+  </div>
+</div>
+
+<!-- FORMULARIO -->
+<div class="form-shell" id="form-shell">
+  <form id="bankable-form" novalidate>
+
+    <!-- SECCIÓN 1: DATOS PERSONALES -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">👤</div>
+        Datos del solicitante
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" id="f-nombre" placeholder="Ej. Juan Carlos Andrade" required>
+        </div>
+        <div class="field">
+          <label>Cargo en la empresa <span class="req">*</span></label>
+          <input type="text" id="f-cargo" placeholder="Ej. Gerente General, Propietario">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" id="f-email" placeholder="correo@empresa.com" required>
+          <span class="field-hint">Aquí se entregará el informe en PDF</span>
+        </div>
+        <div class="field">
+          <label>Teléfono / WhatsApp <span class="req">*</span></label>
+          <input type="tel" id="f-telefono" placeholder="+593 9X XXX XXXX" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: TIPO DE SOLICITANTE Y DATOS -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">🏢</div>
+        Tipo de solicitante
+      </div>
+
+      <div class="field-row single" style="margin-bottom:18px;">
+        <div class="field">
+          <label>¿Cómo aplica al crédito? <span class="req">*</span></label>
+          <div class="plan-grid" style="grid-template-columns:1fr 1fr;" id="tipo-solicitante-group">
+            <label class="plan-card" id="card-natural" for="rb-natural">
+              <input type="radio" name="tipo-solicitante" value="natural" id="rb-natural" onchange="setTipoSolicitante('natural')">
+              <div class="plan-name" style="text-align:center;">👤 Persona Natural</div>
+              <div class="plan-features" style="text-align:center;">Negocio a título personal o profesional independiente</div>
+            </label>
+            <label class="plan-card selected" id="card-juridica" for="rb-juridica">
+              <input type="radio" name="tipo-solicitante" value="juridica" id="rb-juridica" checked onchange="setTipoSolicitante('juridica')">
+              <div class="plan-name" style="text-align:center;">🏢 Persona Jurídica</div>
+              <div class="plan-features" style="text-align:center;">Empresa o sociedad constituida legalmente</div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label id="label-razon-social">Razón social <span class="req">*</span></label>
+          <input type="text" id="f-empresa" placeholder="Nombre legal de la empresa" required>
+        </div>
+        <div class="field">
+          <label id="label-ruc-cedula">RUC <span class="req">*</span></label>
+          <input type="text" id="f-ruc" placeholder="13 dígitos" required>
+          <span class="field-hint" id="hint-ruc-cedula">Si aplica como persona jurídica, ingrese el RUC. Si aplica como persona natural, puede ingresar su cédula o RUC de persona natural.</span>
+        </div>
+      </div>
+
+      <!-- Declaración de representación (solo persona jurídica) -->
+      <div class="field-row single" id="bloque-representacion" style="margin-bottom:18px;">
+        <div class="field">
+          <label>¿Cuál es su rol frente a esta solicitud? <span class="req">*</span></label>
+          <select id="f-rol-representacion" required onchange="toggleAutorizacionDoc()">
+            <option value="">Seleccionar</option>
+            <option value="representante-legal">Soy el representante legal de la empresa</option>
+            <option value="autorizado">Actúo con autorización del representante legal</option>
+          </select>
+          <span class="field-hint">Esta información se verifica contra el registro público de la Superintendencia de Compañías antes de iniciar el análisis.</span>
+        </div>
+      </div>
+
+      <!-- Cédula del representante legal (solo visible si actúa por delegación) -->
+      <div class="field-row" id="campo-cedula-rl" style="display:none;">
+        <div class="field">
+          <label>Cédula del representante legal <span class="req">*</span></label>
+          <input type="text" id="f-cedula-rl" placeholder="10 dígitos">
+          <span class="field-hint">El representante legal registrado en la Superintendencia de Compañías — no usted, sino quien le autoriza.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2C: DOCUMENTOS DE IDENTIFICACIÓN Y REPRESENTACIÓN -->
+    <div class="form-section" id="seccion-doc-identidad">
+      <div class="form-section-title">
+        <div class="icon">🪪</div>
+        Documentos de identificación
+      </div>
+
+      <!-- Cédula propia (siempre requerida — natural, o jurídica sea RL o autorizado) -->
+      <div class="field" style="margin-bottom:16px;">
+        <label id="label-doc-cedula-propia">Cédula del solicitante <span class="req">*</span></label>
+        <div class="upload-area" id="upload-cedula_propia">
+          <input type="file" id="file-cedula-propia" accept=".pdf,.jpg,.jpeg,.png"
+                 onchange="handleFiles('cedula_propia', this.files)">
+          <div class="upload-icon">🪪</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF, JPG o PNG · máx. 10 MB</div>
+        </div>
+        <div class="upload-list" id="list-cedula_propia"></div>
+        <span class="field-hint" id="hint-doc-cedula-propia">Cédula de la persona que completa este formulario.</span>
+      </div>
+
+      <!-- Cédula del representante legal (documento físico, solo si actúa por delegación) -->
+      <div class="field" id="bloque-doc-cedula-rl" style="display:none;margin-bottom:16px;">
+        <label>Cédula del representante legal <span class="req">*</span></label>
+        <div class="upload-area" id="upload-cedula_rl">
+          <input type="file" id="file-cedula-rl" accept=".pdf,.jpg,.jpeg,.png"
+                 onchange="handleFiles('cedula_rl', this.files)">
+          <div class="upload-icon">🪪</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF, JPG o PNG · máx. 10 MB</div>
+        </div>
+        <div class="upload-list" id="list-cedula_rl"></div>
+        <span class="field-hint">Cédula de la persona registrada como representante legal en la Superintendencia de Compañías.</span>
+      </div>
+
+      <!-- Documento de autorización (solo si actúa por delegación) -->
+      <div class="field" id="bloque-doc-autorizacion" style="display:none;margin-bottom:0;">
+        <label>Autorización firmada por el representante legal <span class="req">*</span></label>
+        <div class="upload-area" id="upload-autorizacion">
+          <input type="file" id="file-autorizacion" accept=".pdf,.jpg,.jpeg,.png"
+                 onchange="handleFiles('autorizacion', this.files)">
+          <div class="upload-icon">✍️</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF, JPG o PNG · máx. 10 MB</div>
+        </div>
+        <div class="upload-list" id="list-autorizacion"></div>
+        <span class="field-hint">Carta firmada por el representante legal autorizándole a gestionar este diagnóstico en nombre de la empresa.</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="field-row">
+        <div class="field">
+          <label>Sector económico <span class="req">*</span></label>
+          <select id="f-sector" required>
+            <option value="">Seleccionar sector</option>
+            <option value="comercio">Comercio</option>
+            <option value="manufactura">Manufactura / Industrial</option>
+            <option value="servicios">Servicios</option>
+            <option value="construccion">Construcción</option>
+            <option value="agro">Agroindustria</option>
+            <option value="transporte">Transporte y logística</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Ciudad</label>
+          <select id="f-ciudad">
+            <option value="quito">Quito</option>
+            <option value="guayaquil">Guayaquil</option>
+            <option value="cuenca">Cuenca</option>
+            <option value="otra">Otra ciudad</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Monto de crédito que busca ($) <span class="req">*</span></label>
+          <input type="number" id="f-monto" placeholder="Ej. 50000" min="1000" step="100" required>
+        </div>
+        <div class="field">
+          <label>¿Ha sido rechazado antes?</label>
+          <select id="f-rechazo">
+            <option value="no">No, es la primera vez</option>
+            <option value="si-1">Sí, una vez</option>
+            <option value="si-2">Sí, dos veces o más</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row single">
+        <div class="field">
+          <label>Contexto adicional <span class="hint-label">(opcional)</span></label>
+          <textarea id="f-contexto" placeholder="Ej. Me rechazaron en Banco X hace 3 meses, no me explicaron por qué. Busco capital de trabajo para..."></textarea>
+          <span class="field-hint">Cualquier detalle que ayude a personalizar el análisis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2B: PERFIL DEL NEGOCIO -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">📈</div>
+        Perfil del negocio
+      </div>
+
+      <div class="field-row single">
+        <div class="field">
+          <label>Descripción de las actividades del negocio <span class="req">*</span></label>
+          <textarea id="f-actividades" placeholder="Describa qué hace la empresa: productos o servicios que ofrece, mercado al que atiende, modelo de negocio..." required></textarea>
+        </div>
+      </div>
+
+      <div class="field-row single">
+        <div class="field">
+          <label>Líneas de productos o servicios <span class="req">*</span></label>
+          <textarea id="f-lineas" placeholder="Liste las principales líneas de productos/servicios y, si es posible, el % de ingresos que representa cada una." required></textarea>
+        </div>
+      </div>
+
+      <!-- TABLA DINÁMICA: Clientes -->
+      <div class="field-row single">
+        <div class="field">
+          <label>Principales clientes y % de participación <span class="req">*</span></label>
+          <span class="field-hint" style="margin-top:0;margin-bottom:8px;">La concentración de clientes es un factor que evalúan los comités de crédito. Agregue sus clientes principales — no es necesario listar todos.</span>
+          <div class="dyn-table" id="tabla-clientes"></div>
+          <button type="button" class="dyn-add-btn" onclick="agregarFila('clientes')">+ Agregar cliente</button>
+        </div>
+      </div>
+
+      <!-- TABLA DINÁMICA: Proveedores -->
+      <div class="field-row single">
+        <div class="field">
+          <label>Principales proveedores — locales y del exterior <span class="req">*</span></label>
+          <div class="dyn-table" id="tabla-proveedores"></div>
+          <button type="button" class="dyn-add-btn" onclick="agregarFila('proveedores')">+ Agregar proveedor</button>
+        </div>
+      </div>
+
+      <!-- TABLA DINÁMICA: Política de crédito ventas -->
+      <div class="field-row single">
+        <div class="field">
+          <label>Política de crédito a clientes (ventas)</label>
+          <div class="dyn-table" id="tabla-ventas"></div>
+          <button type="button" class="dyn-add-btn" onclick="agregarFila('ventas')">+ Agregar condición</button>
+        </div>
+      </div>
+
+      <!-- TABLA DINÁMICA: Política de crédito compras -->
+      <div class="field-row single">
+        <div class="field">
+          <label>Política de crédito de proveedores (compras)</label>
+          <div class="dyn-table" id="tabla-compras"></div>
+          <button type="button" class="dyn-add-btn" onclick="agregarFila('compras')">+ Agregar condición</button>
+        </div>
+      </div>
+
+      <!-- TABLA DINÁMICA: Accionistas -->
+      <div class="field-row single">
+        <div class="field">
+          <label>Accionistas / socios <span class="req">*</span></label>
+          <span class="field-hint" style="margin-top:0;margin-bottom:8px;">Nombre completo, número de cédula y porcentaje de participación de cada accionista o socio.</span>
+          <div class="dyn-table" id="tabla-accionistas"></div>
+          <button type="button" class="dyn-add-btn" onclick="agregarFila('accionistas')">+ Agregar accionista</button>
+        </div>
+      </div>
+
+      <!-- TABLA DINÁMICA: Empresas vinculadas -->
+      <div class="field-row single">
+        <div class="field">
+          <label>¿Existe relación con otras empresas? <span class="hint-label">(grupo económico, empresas vinculadas)</span></label>
+          <div class="dyn-table" id="tabla-vinculadas"></div>
+          <button type="button" class="dyn-add-btn" onclick="agregarFila('vinculadas')">+ Agregar empresa vinculada</button>
+          <span class="field-hint" id="vinculadas-vacio-hint">Si no aplica, déjelo vacío y continúe — se registrará como "Ninguna".</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: PLAN -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">📋</div>
+        Seleccione su plan
+      </div>
+
+      <div class="plan-grid">
+
+        <label class="plan-card" id="card-basico">
+          <input type="radio" name="plan" value="basico" id="plan-basico">
+          <div class="plan-name">Básico</div>
+          <div class="plan-price"><sup>$</sup>300</div>
+          <div class="plan-features">
+            Diagnóstico 7 módulos<br>
+            Score con semáforo<br>
+            Hoja de ruta 5 acciones<br>
+            Entrega en 72h
+          </div>
+        </label>
+
+        <label class="plan-card featured" id="card-estandar">
+          <div class="plan-badge">⭐ Recomendado</div>
+          <input type="radio" name="plan" value="estandar" id="plan-estandar" checked>
+          <div class="plan-name">Estándar</div>
+          <div class="plan-price"><sup>$</sup>550</div>
+          <div class="plan-features">
+            Todo lo del Básico<br>
+            Comparación de bancos<br>
+            Llamada revisión 30 min<br>
+            Entrega en 72h
+          </div>
+        </label>
+
+        <label class="plan-card" id="card-premium">
+          <input type="radio" name="plan" value="premium" id="plan-premium">
+          <div class="plan-name">Premium</div>
+          <div class="plan-price"><sup>$</sup>900</div>
+          <div class="plan-features">
+            Todo lo del Estándar<br>
+            Expediente completo<br>
+            Sesión estratégica 90 min<br>
+            Seguimiento 30 días
+          </div>
+        </label>
+
+      </div>
+      <div class="field-hint" style="margin-top:8px;text-align:center;">Puede cambiar de plan antes de confirmar el pago</div>
+    </div>
+
+    <!-- SECCIÓN 4: DOCUMENTOS -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="icon">📎</div>
+        Documentos para el análisis
+      </div>
+
+      <!-- RUC / Cédula -->
+      <div class="field" style="margin-bottom:16px;">
+        <label id="label-doc-ruc">RUC de la empresa <span class="req">*</span></label>
+        <div class="upload-area" id="upload-ruc">
+          <input type="file" id="file-ruc" accept=".pdf,.jpg,.jpeg,.png"
+                 onchange="handleFiles('ruc', this.files)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF, JPG o PNG · máx. 10 MB</div>
+        </div>
+        <div class="upload-list" id="list-ruc"></div>
+        <span class="field-hint" id="hint-doc-ruc">Documento de RUC de la empresa. Si aplica como persona natural, puede subir su cédula o RUC de persona natural.</span>
+      </div>
+
+      <!-- Estados financieros -->
+      <div class="field" style="margin-bottom:16px;">
+        <label>Estados financieros internos — último trimestre <span class="hint-label">(opcional)</span></label>
+        <div class="upload-area" id="upload-financieros">
+          <input type="file" id="file-financieros" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls"
+                 multiple onchange="handleFiles('financieros', this.files)">
+          <div class="upload-icon">📊</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF o Excel · máx. 10 MB por archivo · hasta 3 archivos</div>
+        </div>
+        <div class="upload-list" id="list-financieros"></div>
+        <span class="field-hint">Balance general y estado de resultados internos del último trimestre cerrado (no requiere auditoría externa). Si no cuenta con estados financieros formales, puede continuar sin este documento — el análisis se ajustará con la información disponible en sus declaraciones de IVA e Impuesto a la Renta.</span>
+      </div>
+
+      <!-- IVA -->
+      <div class="field" style="margin-bottom:16px;">
+        <label>Declaraciones de IVA — hasta los últimos 6 meses <span class="req">*</span></label>
+        <div class="upload-area" id="upload-iva">
+          <input type="file" id="file-iva" accept=".pdf,.jpg,.jpeg,.png"
+                 multiple onchange="handleFiles('iva', this.files)">
+          <div class="upload-icon">🧾</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF o foto · máx. 10 MB por archivo · mínimo 1, hasta 6 archivos</div>
+        </div>
+        <div class="upload-list" id="list-iva"></div>
+        <span class="field-hint">Suba las declaraciones mensuales del SRI que tenga disponibles — idealmente las 6 más recientes, pero el análisis puede realizarse con menos.</span>
+      </div>
+
+      <!-- Impuesto a la Renta -->
+      <div class="field" style="margin-bottom:0;">
+        <label>Declaraciones de Impuesto a la Renta — hasta 3 últimos años fiscales <span class="req">*</span></label>
+        <div class="upload-area" id="upload-renta">
+          <input type="file" id="file-renta" accept=".pdf,.jpg,.jpeg,.png"
+                 multiple onchange="handleFiles('renta', this.files)">
+          <div class="upload-icon">📑</div>
+          <div class="upload-title">Arrastra aquí o haz clic para subir</div>
+          <div class="upload-sub">PDF o foto · máx. 10 MB por archivo · mínimo 1, hasta 3 archivos</div>
+        </div>
+        <div class="upload-list" id="list-renta"></div>
+        <span class="field-hint">Idealmente los 3 últimos años fiscales. Si solo tiene 1 o 2 años de operación o de declaraciones disponibles, puede subir los que tenga.</span>
+      </div>
+
+      <!-- Nota Google Drive -->
+      <div class="drive-note">
+        <div style="font-size:20px;flex-shrink:0;">🔒</div>
+        <p><strong>Sus documentos se almacenan de forma segura.</strong> Todo se guarda en Google Drive bajo una carpeta privada con su número de referencia. Solo el equipo de BANKABLE tiene acceso. Sus datos no se comparten con terceros ni con entidades bancarias sin su autorización expresa.</p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: AUTORIZACIONES Y ENVÍO -->
+    <div class="form-section">
+
+      <!-- Autorización buró de crédito -->
+      <div style="background:var(--ivory);border:1px solid var(--border);border-radius:9px;padding:18px 20px;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="font-size:16px;">🏦</span>
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--navy);">Autorización para consulta de buró de crédito</span>
+        </div>
+        <div class="privacy-check">
+          <input type="checkbox" id="f-buro" required>
+          <label for="f-buro">
+            Autorizo expresamente a <strong>VÉRTICE ANALÍTICA</strong> a consultar mi historial crediticio en los burós de información crediticia autorizados en Ecuador (Equifax Ecuador, DICOM/Buró de Crédito, y/o el reporte de la Superintendencia de Bancos), de conformidad con la <strong>Ley Orgánica de Protección de Datos Personales</strong> y la normativa vigente sobre buroes de información crediticia. Entiendo que esta consulta tiene como único fin la elaboración del diagnóstico BANKABLE y que la información obtenida será tratada con confidencialidad. <span class="req">*</span>
+          </label>
+        </div>
+        <p style="font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.55;padding-left:26px;">
+          Esta autorización es indispensable para evaluar el módulo de Historial Crediticio (20% del score BANKABLE). Sin esta autorización, el diagnóstico se entrega con ese módulo marcado como "no evaluado" y un score parcial.
+        </p>
+      </div>
+
+      <div class="privacy-check">
+        <input type="checkbox" id="f-privacy" required>
+        <label for="f-privacy">
+          Autorizo a VÉRTICE ANALÍTICA a procesar mis datos personales y documentos financieros para la elaboración del diagnóstico BANKABLE. Los datos se usarán exclusivamente para este fin y no serán compartidos con terceros. <a href="#">Política de privacidad</a>.
+        </label>
+      </div>
+
+      <div class="submit-area">
+        <button type="submit" class="btn-submit" id="btn-submit">
+          Enviar solicitud de diagnóstico →
+        </button>
+        <p class="submit-note">
+          Recibirá una confirmación por email en los próximos 15 minutos.<br>
+          El informe se entrega en <strong>72 horas</strong> una vez confirmado el pago.
+        </p>
+      </div>
+
+      <div class="garantias">
+        <span class="garantia">Metodología de comité de crédito</span>
+        <span class="garantia">Confidencialidad total</span>
+        <span class="garantia">Entrega garantizada 72h</span>
+        <span class="garantia">7 módulos de evaluación</span>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- PANTALLA DE ÉXITO -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">✅</div>
+  <h2 class="success-title">¡Solicitud recibida!</h2>
+  <p class="success-sub">Sus datos y documentos han sido almacenados de forma segura. Verificaremos su representación legal antes de enviarle el link de pago.</p>
+  <div class="success-ref" id="success-ref">BANKABLE-2025-0012</div>
+
+  <!-- BLOQUE INFORMATIVO — sin pago inmediato -->
+  <div style="background:var(--navy);border-radius:12px;padding:24px;margin-bottom:24px;text-align:left;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="font-size:22px;">🔍</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:#fff;">Verificación en proceso</span>
+    </div>
+    <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:14px;">
+      Antes de procesar el pago, verificamos su representación legal en el registro público de la Superintendencia de Compañías. Este paso protege la seguridad de su información financiera.
+    </p>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);">
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);">Monto del plan <span id="pago-plan-nombre">Estándar</span></span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--gold);" id="pago-monto">$550</span>
+    </div>
+    <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:8px;">
+      Le enviaremos el link de pago seguro por WhatsApp y email una vez completada la verificación (1-2 días hábiles).
+    </p>
+  </div>
+
+  <div class="success-steps">
+    <h4>¿Qué pasa ahora?</h4>
+    <div class="success-step">
+      <div class="ss-num">1</div>
+      <div class="ss-text"><strong>Verificación de representación</strong> — Confirmamos su rol frente a la empresa en el registro público de la Superintendencia de Compañías (1-2 días hábiles).</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">2</div>
+      <div class="ss-text"><strong>Le enviamos el link de pago</strong> — Por WhatsApp y email, una vez verificada su representación. El pago se procesa con tarjeta de forma segura.</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">3</div>
+      <div class="ss-text"><strong>Análisis en proceso</strong> — Nuestro equipo evalúa los 7 módulos con sus documentos reales: RUC, estados financieros e IVA.</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">4</div>
+      <div class="ss-text"><strong>Entrega del informe</strong> — Recibirá el PDF a <span id="success-email">su correo</span> en máximo <strong>72 horas</strong> desde el pago confirmado.</div>
+    </div>
+    <div class="success-step">
+      <div class="ss-num">5</div>
+      <div class="ss-text"><strong>Llamada de revisión</strong> (Plan Estándar y Premium) — Le contactaremos para agendar la revisión del informe.</div>
+    </div>
+  </div>
+
+  <a href="https://wa.me/593985365281" target="_blank" class="btn-wa">
+    💬 Tengo una pregunta sobre mi solicitud
+  </a>
+</div>
+
+<script>
+// ── NOTA: BANKABLE no tiene pago inmediato — el link de pago se envía
+// manualmente por Piero (WhatsApp/email) después de verificar la
+// representación legal en la Superintendencia de Compañías.
+// El monto se muestra solo informativamente en la pantalla de confirmación.
+
+// ── PRE-RELLENAR DESDE URL PARAMS ────────────────────────────────
+function preRellenar() {
+  const p = new URLSearchParams(window.location.search);
+  const plan = p.get('plan');
+  if (plan && document.getElementById('plan-' + plan)) {
+    document.getElementById('plan-' + plan).checked = true;
+    document.querySelectorAll('input[name="plan"]').forEach(r => {
+      r.closest('.plan-card').classList.remove('selected');
+    });
+    const card = document.getElementById('card-' + plan);
+    if (card) card.classList.add('selected');
+  }
+}
+preRellenar();
+
+// ── TIPO DE SOLICITANTE: persona natural vs jurídica ────────────
+function setTipoSolicitante(tipo) {
+  document.getElementById('rb-' + tipo).checked = true;
+  document.getElementById('card-natural').classList.toggle('selected', tipo === 'natural');
+  document.getElementById('card-juridica').classList.toggle('selected', tipo === 'juridica');
+
+  const labelRazon  = document.getElementById('label-razon-social');
+  const labelRucCed = document.getElementById('label-ruc-cedula');
+  const hintRucCed  = document.getElementById('hint-ruc-cedula');
+  const placeholderEmpresa = document.getElementById('f-empresa');
+  const placeholderRuc     = document.getElementById('f-ruc');
+  const labelDocRuc = document.getElementById('label-doc-ruc');
+  const hintDocRuc  = document.getElementById('hint-doc-ruc');
+
+  if (tipo === 'natural') {
+    labelRazon.innerHTML  = 'Nombre completo del solicitante <span class="req">*</span>';
+    labelRucCed.innerHTML = 'Cédula o RUC de persona natural <span class="req">*</span>';
+    hintRucCed.textContent = 'Ingrese su número de cédula, o el RUC de persona natural si lo tiene.';
+    placeholderEmpresa.placeholder = 'Nombre completo según cédula';
+    placeholderRuc.placeholder = '10 dígitos (cédula) o 13 (RUC)';
+    labelDocRuc.innerHTML = 'Cédula o RUC de persona natural <span class="req">*</span>';
+    hintDocRuc.textContent = 'Documento de identificación: cédula de ciudadanía o RUC de persona natural.';
+  } else {
+    labelRazon.innerHTML  = 'Razón social <span class="req">*</span>';
+    labelRucCed.innerHTML = 'RUC <span class="req">*</span>';
+    hintRucCed.textContent = 'Si aplica como persona jurídica, ingrese el RUC. Si aplica como persona natural, puede ingresar su cédula o RUC de persona natural.';
+    placeholderEmpresa.placeholder = 'Nombre legal de la empresa';
+    placeholderRuc.placeholder = '13 dígitos';
+    labelDocRuc.innerHTML = 'RUC de la empresa <span class="req">*</span>';
+    hintDocRuc.textContent = 'Documento de RUC de la empresa. Si aplica como persona natural, puede subir su cédula o RUC de persona natural.';
+  }
+
+  // El bloque de representación legal solo aplica a persona jurídica
+  const bloqueRep = document.getElementById('bloque-representacion');
+  const rolSelect = document.getElementById('f-rol-representacion');
+  const labelDocCedProp = document.getElementById('label-doc-cedula-propia');
+  const hintDocCedProp  = document.getElementById('hint-doc-cedula-propia');
+
+  if (tipo === 'natural') {
+    bloqueRep.style.display = 'none';
+    rolSelect.required = false;
+    rolSelect.value = '';
+    document.getElementById('campo-cedula-rl').style.display = 'none';
+    document.getElementById('bloque-doc-cedula-rl').style.display = 'none';
+    document.getElementById('bloque-doc-autorizacion').style.display = 'none';
+    document.getElementById('f-cedula-rl').required = false;
+    document.getElementById('file-cedula-rl').required = false;
+    document.getElementById('file-autorizacion').required = false;
+    labelDocCedProp.innerHTML = 'Cédula del solicitante <span class="req">*</span>';
+    hintDocCedProp.textContent = 'Su cédula de ciudadanía — usted es quien solicita el diagnóstico a título personal.';
+  } else {
+    bloqueRep.style.display = '';
+    rolSelect.required = true;
+    toggleAutorizacionDoc(); // re-evaluar según el rol ya seleccionado (si lo hay)
+  }
+}
+
+// ── DOCUMENTOS SEGÚN ROL: matriz completa para persona jurídica ──
+// Caso A — "Soy el representante legal": solo cédula propia (= cédula del RL)
+// Caso B — "Actúo con autorización": cédula propia + cédula del RL + carta de autorización
+function toggleAutorizacionDoc() {
+  const rol = document.getElementById('f-rol-representacion').value;
+  const campoCedRL   = document.getElementById('campo-cedula-rl');
+  const bloqueDocRL  = document.getElementById('bloque-doc-cedula-rl');
+  const bloqueDoc    = document.getElementById('bloque-doc-autorizacion');
+  const cedRLInput   = document.getElementById('f-cedula-rl');
+  const fileRLInput  = document.getElementById('file-cedula-rl');
+  const fileAutInput = document.getElementById('file-autorizacion');
+  const labelDocCedProp = document.getElementById('label-doc-cedula-propia');
+  const hintDocCedProp  = document.getElementById('hint-doc-cedula-propia');
+
+  if (rol === 'autorizado') {
+    // Caso B: necesita los 3 documentos
+    campoCedRL.style.display = '';
+    bloqueDocRL.style.display = 'block';
+    bloqueDoc.style.display = 'block';
+    cedRLInput.required = true;
+    fileRLInput.required = true;
+    fileAutInput.required = true;
+    labelDocCedProp.innerHTML = 'Cédula de quien gestiona esta solicitud <span class="req">*</span>';
+    hintDocCedProp.textContent = 'Cédula de la persona que está llenando este formulario (no la del representante legal).';
+  } else if (rol === 'representante-legal') {
+    // Caso A: solo cédula propia, que ES la del representante legal
+    campoCedRL.style.display = 'none';
+    bloqueDocRL.style.display = 'none';
+    bloqueDoc.style.display = 'none';
+    cedRLInput.required = false;
+    fileRLInput.required = false;
+    fileAutInput.required = false;
+    labelDocCedProp.innerHTML = 'Cédula del representante legal (la suya) <span class="req">*</span>';
+    hintDocCedProp.textContent = 'Su cédula — usted es el representante legal registrado en la Superintendencia de Compañías.';
+  } else {
+    // Sin selección aún
+    campoCedRL.style.display = 'none';
+    bloqueDocRL.style.display = 'none';
+    bloqueDoc.style.display = 'none';
+    cedRLInput.required = false;
+    fileRLInput.required = false;
+    fileAutInput.required = false;
+  }
+}
+
+// ── TABLAS DINÁMICAS: clientes, proveedores, ventas, compras, accionistas, vinculadas ──
+const TABLA_CONFIG = {
+  clientes: {
+    campos: [
+      { id: 'nombre', label: 'Nombre del cliente', type: 'text', placeholder: 'Ej. Distribuidora XYZ' },
+      { id: 'pct', label: '% de ventas', type: 'number', placeholder: '35', min: 0, max: 100 },
+      { id: 'antiguedad', label: 'Antigüedad', type: 'text', placeholder: 'Ej. 5 años' },
+    ],
+    vacio: 'Aún no ha agregado clientes. Use el botón de abajo para agregar el primero.'
+  },
+  proveedores: {
+    campos: [
+      { id: 'nombre', label: 'Nombre del proveedor', type: 'text', placeholder: 'Ej. Importadora ABC' },
+      { id: 'origen', label: 'Origen', type: 'select', options: ['Local', 'Exterior'] },
+      { id: 'insumo', label: 'Insumo/producto', type: 'text', placeholder: 'Ej. Materia prima' },
+      { id: 'pct', label: '% dependencia', type: 'number', placeholder: '20', min: 0, max: 100 },
+    ],
+    vacio: 'Aún no ha agregado proveedores. Use el botón de abajo para agregar el primero.'
+  },
+  ventas: {
+    campos: [
+      { id: 'plazo', label: 'Plazo otorgado', type: 'text', placeholder: 'Ej. 30 días' },
+      { id: 'pct_contado', label: '% al contado', type: 'number', placeholder: '60', min: 0, max: 100 },
+      { id: 'pct_credito', label: '% a crédito', type: 'number', placeholder: '40', min: 0, max: 100 },
+    ],
+    vacio: 'Sin condiciones registradas — opcional.'
+  },
+  compras: {
+    campos: [
+      { id: 'plazo', label: 'Plazo recibido', type: 'text', placeholder: 'Ej. 45 días' },
+      { id: 'proveedor', label: 'Proveedor principal', type: 'text', placeholder: 'Ej. Importadora ABC' },
+    ],
+    vacio: 'Sin condiciones registradas — opcional.'
+  },
+  accionistas: {
+    campos: [
+      { id: 'nombre', label: 'Nombre completo', type: 'text', placeholder: 'Ej. Juan Pérez' },
+      { id: 'cedula', label: 'Cédula', type: 'text', placeholder: '10 dígitos' },
+      { id: 'pct', label: '% participación', type: 'number', placeholder: '60', min: 0, max: 100 },
+    ],
+    vacio: 'Aún no ha agregado accionistas. Use el botón de abajo para agregar el primero.'
+  },
+  vinculadas: {
+    campos: [
+      { id: 'nombre', label: 'Nombre de la empresa', type: 'text', placeholder: 'Ej. Comercial XYZ S.A.' },
+      { id: 'tipo', label: 'Tipo de relación', type: 'select', options: ['Accionista común', 'Proveedor', 'Cliente', 'Otro'] },
+      { id: 'detalle', label: 'Detalle', type: 'text', placeholder: 'Ej. Mismo accionista mayoritario' },
+    ],
+    vacio: 'Sin empresas vinculadas registradas.'
+  },
+};
+
+const TABLA_DATA = { clientes: [], proveedores: [], ventas: [], compras: [], accionistas: [], vinculadas: [] };
+let TABLA_ROW_ID = 0;
+
+function agregarFila(tabla) {
+  const fila = { __id: TABLA_ROW_ID++ };
+  TABLA_CONFIG[tabla].campos.forEach(c => fila[c.id] = '');
+  TABLA_DATA[tabla].push(fila);
+  renderTabla(tabla);
+}
+
+function eliminarFila(tabla, rowId) {
+  TABLA_DATA[tabla] = TABLA_DATA[tabla].filter(f => f.__id !== rowId);
+  renderTabla(tabla);
+}
+
+function actualizarCampoTabla(tabla, rowId, campoId, valor) {
+  const fila = TABLA_DATA[tabla].find(f => f.__id === rowId);
+  if (fila) fila[campoId] = valor;
+}
+
+function renderTabla(tabla) {
+  const cont = document.getElementById('tabla-' + tabla);
+  const cfg  = TABLA_CONFIG[tabla];
+  const filas = TABLA_DATA[tabla];
+
+  if (filas.length === 0) {
+    cont.innerHTML = `<div class="dyn-empty">${cfg.vacio}</div>`;
+    return;
+  }
+
+  cont.innerHTML = filas.map(fila => {
+    const campos = cfg.campos.map(c => {
+      if (c.type === 'select') {
+        const opts = c.options.map(o =>
+          `<option value="${o}" ${fila[c.id]===o?'selected':''}>${o}</option>`
+        ).join('');
+        return `<div class="dyn-field">
+          <label>${c.label}</label>
+          <select onchange="actualizarCampoTabla('${tabla}',${fila.__id},'${c.id}',this.value)">
+            <option value="">—</option>${opts}
+          </select>
+        </div>`;
+      }
+      return `<div class="dyn-field">
+        <label>${c.label}</label>
+        <input type="${c.type}" placeholder="${c.placeholder||''}"
+          ${c.min!==undefined?`min="${c.min}"`:''} ${c.max!==undefined?`max="${c.max}"`:''}
+          value="${fila[c.id]||''}"
+          oninput="actualizarCampoTabla('${tabla}',${fila.__id},'${c.id}',this.value)">
+      </div>`;
+    }).join('');
+
+    return `<div class="dyn-row">
+      <div class="dyn-row-fields">${campos}</div>
+      <button type="button" class="dyn-remove" onclick="eliminarFila('${tabla}',${fila.__id})" title="Eliminar">×</button>
+    </div>`;
+  }).join('');
+}
+
+// Inicializar las 6 tablas vacías al cargar
+Object.keys(TABLA_CONFIG).forEach(renderTabla);
+
+// Convierte los datos de una tabla en texto legible para el reporte/email
+function tablaATexto(tabla) {
+  const filas = TABLA_DATA[tabla];
+  if (filas.length === 0) return TABLA_CONFIG[tabla].vacio.includes('opcional') || tabla === 'vinculadas' ? 'Ninguna' : '(sin datos)';
+  const cfg = TABLA_CONFIG[tabla];
+  return filas.map(f =>
+    cfg.campos.map(c => `${c.label}: ${f[c.id] || '—'}`).join(' · ')
+  ).join(' | ');
+}
+
+// ── PLAN CARDS (solo afecta selector de planes, no tipo-solicitante) ──
+document.querySelectorAll('input[name="plan"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('input[name="plan"]').forEach(r => {
+      r.closest('.plan-card').classList.remove('selected');
+    });
+    this.closest('.plan-card').classList.add('selected');
+  });
+});
+document.getElementById('card-estandar').classList.add('selected');
+
+// ── FILE UPLOADS ───────────────────────────────────────────────
+const fileStores = { ruc: [], financieros: [], iva: [], renta: [], autorizacion: [], cedula_propia: [], cedula_rl: [] };
+const maxFilesMap = { ruc: 1, financieros: 3, iva: 6, renta: 3, autorizacion: 1, cedula_propia: 1, cedula_rl: 1 };
+const minFilesMap = { ruc: 1, financieros: 0, iva: 1, renta: 1, autorizacion: 1, cedula_propia: 1, cedula_rl: 1 };
+
+function handleFiles(type, files) {
+  const maxFiles = maxFilesMap[type] || 1;
+  const maxSize  = 10 * 1024 * 1024; // 10MB
+
+  Array.from(files).forEach(file => {
+    if (fileStores[type].length >= maxFiles) {
+      alert(`Máximo ${maxFiles} archivo(s) para este campo.`); return;
+    }
+    if (file.size > maxSize) {
+      alert(`El archivo "${file.name}" supera 10MB.`); return;
+    }
+    fileStores[type].push(file);
+  });
+  renderFileList(type);
+}
+
+function renderFileList(type) {
+  const list = document.getElementById('list-' + type);
+  list.innerHTML = '';
+  fileStores[type].forEach((file, idx) => {
+    const ext  = file.name.split('.').pop().toLowerCase();
+    const icon = ['pdf'].includes(ext) ? '📄' : ['jpg','jpeg','png','heic'].includes(ext) ? '🖼️' : '📊';
+    const div  = document.createElement('div');
+    div.className = 'upload-item';
+    div.innerHTML = `
+      <span class="file-icon">${icon}</span>
+      <span class="file-name">${file.name}</span>
+      <span class="file-size" style="font-size:11px;color:var(--ink3);white-space:nowrap;">${(file.size/1024/1024).toFixed(1)}MB</span>
+      <span class="file-remove" onclick="removeFile('${type}',${idx})" title="Eliminar">×</span>`;
+    list.appendChild(div);
+  });
+
+  // Progreso para campos con múltiples archivos (mínimo flexible, máximo ideal)
+  if (type === 'financieros' || type === 'iva' || type === 'renta') {
+    const min = minFilesMap[type];
+    const max = maxFilesMap[type];
+    const count = fileStores[type].length;
+    const existing = document.getElementById(type + '-progress');
+    if (existing) existing.remove();
+
+    // Si el campo es opcional (min=0) y no hay archivos, no mostrar ningún indicador
+    if (min === 0 && count === 0) return;
+
+    const prog = document.createElement('div');
+    prog.id = type + '-progress';
+    const cumpleMinimo = count >= min && count > 0;
+    prog.style = `font-size:12px;font-weight:500;margin-top:8px;padding:6px 10px;border-radius:6px;display:inline-block;
+      background:${count===max?'rgba(46,158,107,0.1)':cumpleMinimo?'rgba(46,158,107,0.08)':'rgba(184,150,60,0.1)'};
+      color:${count===max?'var(--green)':cumpleMinimo?'var(--green)':'var(--gold)'};`;
+    prog.textContent = count === max
+      ? `✓ ${max} de ${max} archivos cargados (ideal)`
+      : cumpleMinimo
+        ? `✓ ${count} archivo(s) cargado(s) — ideal hasta ${max}`
+        : min === 0
+          ? `${count} archivo(s) cargado(s) — opcional, ideal hasta ${max}`
+          : `${count} de ${min} archivo(s) mínimo requerido(s)`;
+    list.parentElement.insertBefore(prog, list.nextSibling);
+  }
+}
+
+function removeFile(type, idx) {
+  fileStores[type].splice(idx, 1);
+  renderFileList(type);
+}
+
+// Drag & drop
+['ruc','financieros','iva','renta','autorizacion','cedula_propia','cedula_rl'].forEach(type => {
+  const area = document.getElementById('upload-' + type);
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag'); });
+  area.addEventListener('dragleave', () => area.classList.remove('drag'));
+  area.addEventListener('drop', e => {
+    e.preventDefault(); area.classList.remove('drag');
+    handleFiles(type, e.dataTransfer.files);
+  });
+});
+
+// ── VALIDACIÓN Y ENVÍO ─────────────────────────────────────────
+function generateRef() {
+  const n = Math.floor(1000 + Math.random() * 9000);
+  return `BANKABLE-2025-${n}`;
+}
+
+function validate() {
+  const required = ['f-nombre','f-email','f-telefono','f-empresa','f-ruc','f-sector','f-monto',
+                     'f-actividades','f-lineas'];
+  let ok = true;
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.style.borderColor = 'var(--red)';
+      ok = false;
+    } else {
+      el.style.borderColor = '';
+    }
+  });
+
+  // Validación de tablas dinámicas obligatorias
+  if (TABLA_DATA.clientes.length === 0) {
+    alert('Por favor agregue al menos un cliente principal.');
+    ok = false;
+  }
+  if (TABLA_DATA.proveedores.length === 0) {
+    alert('Por favor agregue al menos un proveedor principal.');
+    ok = false;
+  }
+  if (TABLA_DATA.accionistas.length === 0) {
+    alert('Por favor agregue al menos un accionista o socio.');
+    ok = false;
+  }
+
+  // Validación de representación y documentos de identidad
+  const tipoSol = document.querySelector('input[name="tipo-solicitante"]:checked').value;
+
+  if (tipoSol === 'natural') {
+    // Persona natural: solo cédula propia
+    if (fileStores.cedula_propia.length < 1) {
+      alert('Por favor adjunte su cédula de ciudadanía.');
+      ok = false;
+    }
+  } else {
+    // Persona jurídica: el rol determina qué documentos se exigen
+    const rol = document.getElementById('f-rol-representacion').value;
+    if (!rol) {
+      document.getElementById('f-rol-representacion').style.borderColor = 'var(--red)';
+      alert('Por favor indique cuál es su rol frente a esta solicitud.');
+      ok = false;
+    }
+
+    // Siempre se requiere la cédula de quien gestiona (sea RL o autorizado)
+    if (fileStores.cedula_propia.length < 1) {
+      alert('Por favor adjunte la cédula de la persona que completa este formulario.');
+      ok = false;
+    }
+
+    if (rol === 'autorizado') {
+      const cedRL = document.getElementById('f-cedula-rl');
+      if (!cedRL.value.trim()) {
+        cedRL.style.borderColor = 'var(--red)';
+        ok = false;
+      }
+      if (fileStores.cedula_rl.length < 1) {
+        alert('Por favor adjunte la cédula del representante legal — requerida cuando usted actúa por delegación.');
+        ok = false;
+      }
+      if (fileStores.autorizacion.length < 1) {
+        alert('Por favor adjunte la autorización firmada por el representante legal — requerida cuando usted actúa por delegación.');
+        ok = false;
+      }
+    }
+  }
+
+  if (!document.getElementById('f-buro').checked) {
+    alert('Debe autorizar la consulta del buró de crédito para continuar — es indispensable para evaluar el módulo de Historial Crediticio.');
+    ok = false;
+  }
+  if (!document.getElementById('f-privacy').checked) {
+    alert('Debe aceptar la política de privacidad para continuar.');
+    ok = false;
+  }
+  if (fileStores.ruc.length < 1) {
+    alert('Por favor adjunte el documento de identificación (RUC o cédula).');
+    ok = false;
+  }
+  if (fileStores.iva.length < 1) {
+    alert('Por favor adjunte al menos una declaración de IVA.');
+    ok = false;
+  }
+  if (fileStores.renta.length < 1) {
+    alert('Por favor adjunte al menos una declaración de Impuesto a la Renta.');
+    ok = false;
+  }
+  return ok;
+}
+
+// ── URL DEL APPS SCRIPT — se configura en el paso de despliegue ──
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0p1D-LoAQWPELtPzMgURPmehzG9toz6iOcCsYu6RTPPknQm2AS7BcU16wXUB3ZKoK/exec';
+
+// Convierte un File a base64 (necesario para enviarlo en el POST)
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function prepararArchivosParaEnvio() {
+  const archivos = {};
+  for (const tipo in fileStores) {
+    archivos[tipo] = [];
+    for (const file of fileStores[tipo]) {
+      const contenido = await fileToBase64(file);
+      archivos[tipo].push({
+        nombre: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        contenido: contenido
+      });
+    }
+  }
+  return archivos;
+}
+
+document.getElementById('bankable-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!validate()) return;
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Subiendo documentos...';
+
+  const ref    = generateRef();
+  const email  = document.getElementById('f-email').value;
+  const plan   = document.querySelector('input[name="plan"]:checked').value;
+  const nombre = document.getElementById('f-nombre').value;
+  const empresa= document.getElementById('f-empresa').value;
+  const telefono = document.getElementById('f-telefono').value;
+  const tipoSol  = document.querySelector('input[name="tipo-solicitante"]:checked').value;
+  const ruc      = document.getElementById('f-ruc').value;
+  const sector   = document.getElementById('f-sector').value;
+  const monto    = document.getElementById('f-monto').value;
+  const rolRepresentacion = tipoSol === 'juridica'
+    ? document.getElementById('f-rol-representacion').value
+    : null;
+
+  // Preparar archivos en base64
+  let archivosListos = {};
+  try {
+    archivosListos = await prepararArchivosParaEnvio();
+  } catch (err) {
+    alert('Hubo un error preparando los documentos. Intente de nuevo.');
+    btn.disabled = false;
+    btn.textContent = 'Enviar solicitud de diagnóstico →';
+    return;
+  }
+
+  btn.textContent = 'Enviando solicitud...';
+
+  const payload = {
+    producto: 'bankable',
+    ref, nombre: empresa, email, telefono, plan,
+    tipoSolicitante: tipoSol, ruc, sector, monto,
+    rolRepresentacion,
+    actividades: document.getElementById('f-actividades').value,
+    lineas: document.getElementById('f-lineas').value,
+    perfilNegocio: {
+      clientes: TABLA_DATA.clientes,
+      proveedores: TABLA_DATA.proveedores,
+      politicaVentas: TABLA_DATA.ventas,
+      politicaCompras: TABLA_DATA.compras,
+      accionistas: TABLA_DATA.accionistas,
+      vinculadas: TABLA_DATA.vinculadas,
+    },
+    archivos: archivosListos
+  };
+
+  // Enviar al Apps Script
+  if (APPS_SCRIPT_URL.includes('PEGA_AQUI')) {
+    console.warn('⚠️ APPS_SCRIPT_URL no configurada — los datos NO se están guardando en Drive ni se envían emails.');
+  } else {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: new URLSearchParams({ payload: JSON.stringify(payload) })
+      });
+    } catch (err) {
+      console.error('Error enviando al backend:', err);
+    }
+  }
+
+  // Mostrar pantalla de éxito
+  document.getElementById('form-shell').style.display = 'none';
+  document.getElementById('success-ref').textContent  = ref;
+  document.getElementById('success-email').textContent = email;
+  document.getElementById('success-screen').style.display = 'block';
+
+  // Conectar plan seleccionado con el bloque informativo de pago
+  const montosPlan = { basico: 300, estandar: 550, premium: 900 };
+  const planNombres = { basico: 'Básico', estandar: 'Estándar', premium: 'Premium' };
+  window.__planSeleccionado = plan;
+  document.getElementById('pago-monto').textContent = '$' + (montosPlan[plan] || 550);
+  document.getElementById('pago-plan-nombre').textContent = planNombres[plan] || 'Estándar';
+
+  // Actualizar pasos
+  ['sn1','sn2','sn3'].forEach(id => {
+    document.getElementById(id).className = 'step-num done';
+    document.getElementById(id).textContent = '✓';
+  });
+
+  // Abrir WhatsApp con resumen completo (las variables tipoSol, ruc, sector, monto
+  // ya fueron declaradas arriba en este mismo handler)
+  const contexto = document.getElementById('f-contexto').value;
+  const clientes = tablaATexto('clientes');
+  const accionistas = tablaATexto('accionistas');
+  const planLabel= {'basico':'Básico $300','estandar':'Estándar $550','premium':'Premium $900'}[plan];
+  const tipoSolLabel = tipoSol === 'natural' ? 'Persona Natural' : 'Persona Jurídica';
+
+  // Datos de representación (solo persona jurídica)
+  let bloqueRepresentacion = '';
+  if (tipoSol === 'juridica') {
+    const rol = document.getElementById('f-rol-representacion').value;
+    const rolLabel = rol === 'representante-legal' ? 'Representante legal (directo)' : 'Actúa por autorización/delegación';
+    bloqueRepresentacion =
+      `\n*⚠️ VERIFICAR EN SUPERCÍAS ANTES DE COBRAR:*\n` +
+      `· Rol declarado: ${rolLabel}\n` +
+      `· Cédula propia adjunta: ${fileStores.cedula_propia.length} archivo(s)\n`;
+    if (rol === 'autorizado') {
+      const cedRL = document.getElementById('f-cedula-rl').value;
+      bloqueRepresentacion +=
+        `· Cédula del RL declarada: ${cedRL}\n` +
+        `· Cédula del RL adjunta: ${fileStores.cedula_rl.length} archivo(s)\n` +
+        `· Doc. autorización adjunto: ${fileStores.autorizacion.length} archivo(s)\n`;
+    }
+    bloqueRepresentacion += `· Verificar en: appscvs.supercias.gob.ec\n`;
+  } else {
+    bloqueRepresentacion = `\n*Cédula adjunta:* ${fileStores.cedula_propia.length} archivo(s)\n`;
+  }
+
+  const msg = `🌟 *Nueva solicitud BANKABLE*\n\n` +
+    `*Ref:* ${ref}\n` +
+    `*Tipo:* ${tipoSolLabel}\n` +
+    `*Nombre/Razón social:* ${empresa}\n` +
+    `*RUC/Cédula:* ${ruc}\n` +
+    `*Email:* ${email}\n` +
+    `*Plan:* ${planLabel}\n` +
+    `*Autorización buró de crédito:* ✓ Otorgada\n` +
+    bloqueRepresentacion + `\n` +
+    `*Solicitud de crédito:*\n` +
+    `· Sector: ${sector}\n` +
+    `· Monto buscado: $${monto}\n` +
+    `· Concentración clientes: ${clientes.substring(0,80)}${clientes.length>80?'...':''}\n` +
+    `· Accionistas: ${accionistas.substring(0,80)}${accionistas.length>80?'...':''}\n` +
+    (contexto ? `\n*Contexto:* ${contexto}\n` : '') +
+    `\n📁 Documentos subidos al Drive\n` +
+    `📄 RUC/Cédula empresa: ${fileStores.ruc.length} archivo(s)\n` +
+    `📊 Estados financieros: ${fileStores.financieros.length} archivo(s)\n` +
+    `🧾 Declaraciones IVA: ${fileStores.iva.length} archivo(s)\n` +
+    `📑 Impuesto a la Renta: ${fileStores.renta.length} archivo(s)`;
+
+  setTimeout(() => {
+    window.open('https://wa.me/593985365281?text=' + encodeURIComponent(msg), '_blank');
+  }, 1000);
+});
+
+// Focus en errores
+document.querySelectorAll('input, select, textarea').forEach(el => {
+  el.addEventListener('input', () => el.style.borderColor = '');
+});
+
+// Inicializar bloque de representación (jurídica es el default seleccionado)
+setTipoSolicitante('juridica');
+</script>
+</body>
+</html>

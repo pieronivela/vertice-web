@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>WATIO — ¿Te conviene la energía solar?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --navy: #0B1F3A;
+    --navy-mid: #122A4E;
+    --gold: #B8963C;
+    --gold-pale: #F5EDD6;
+    --bg-calc: #F7F5F0;
+    --surface: #FFFFFF;
+    --ink: #0E0E0C;
+    --ink2: #4A4A46;
+    --ink3: #8A8A84;
+    --accent: #B8963C;
+    --accent-dark: #8C7129;
+    --border: #E5E2D9;
+    --border2: #D8D4C8;
+    --red: #B03A2E;
+    --green-fin: #2E9E6B;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    background: var(--bg-calc);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-calc);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(184,150,60,0.2);
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-back {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    transition: color .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .topbar-back:hover {
+    color: var(--gold);
+  }
+  .topbar-tag {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  @media(max-width:600px){
+    .topbar-back { display:none; }
+  }
+
+  /* HERO */
+  .hero {
+    padding: 48px 32px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--bg-calc);
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.8vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+    color: var(--navy);
+    margin-bottom: 14px;
+  }
+  .hero-title .hl {
+    background: var(--gold-pale);
+    color: var(--navy);
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--ink2);
+    max-width: 520px;
+    line-height: 1.65;
+  }
+
+  /* MAIN LAYOUT */
+  .calc-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* INPUTS PANEL */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-header-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--navy);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .panel-header-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--gold);
+  }
+  .panel-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .panel-body {
+    padding: 20px 24px 24px;
+  }
+
+  /* FIELD GROUPS */
+  .field-group {
+    margin-bottom: 22px;
+  }
+  .field-group:last-child {
+    margin-bottom: 0;
+  }
+  .field-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink2);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .field-label .hint {
+    font-size: 11px;
+    color: var(--ink3);
+    font-weight: 400;
+  }
+
+  /* SLIDER */
+  .slider-wrap {
+    position: relative;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border2);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 2.5px solid var(--gold);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  .slider-value-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink3);
+  }
+  .slider-main-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  /* SELECT BUTTONS */
+  .btn-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .btn-opt {
+    padding: 7px 14px;
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink2);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .btn-opt:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+  }
+  .btn-opt.active {
+    background: var(--navy);
+    color: var(--gold);
+    border-color: var(--navy);
+    font-weight: 500;
+  }
+
+  /* DIVIDER */
+  .field-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* RESULTS PANEL */
+  .results-panel {
+    position: sticky;
+    top: 72px;
+  }
+
+  /* TICKER - main output */
+  .ticker-panel {
+    background: var(--navy);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .ticker-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ticker-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .ticker-body {
+    padding: 20px;
+  }
+
+  /* MAIN METRIC */
+  .main-metric {
+    margin-bottom: 20px;
+  }
+  .main-metric-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .main-metric-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: -2px;
+    line-height: 1;
+    transition: all 0.2s;
+  }
+  .main-metric-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 5px;
+  }
+
+  /* METRICS GRID */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .metric-cell {
+    background: rgba(255,255,255,0.04);
+    padding: 14px 16px;
+  }
+  .metric-cell-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .metric-cell-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.5px;
+    transition: all 0.2s;
+  }
+  .metric-cell-value.positive { color: #69F0AE; }
+  .metric-cell-value.negative { color: #FF6B6B; }
+  .metric-cell-value.accent { color: var(--gold); }
+  .metric-cell-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    margin-top: 2px;
+  }
+
+  /* VERDICT */
+  .verdict-bar {
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s;
+  }
+  .verdict-bar.good { background: rgba(46,158,107,0.14); border: 1px solid rgba(46,158,107,0.3); }
+  .verdict-bar.warn { background: rgba(184,150,60,0.14); border: 1px solid rgba(184,150,60,0.3); }
+  .verdict-bar.bad { background: rgba(176,58,46,0.12); border: 1px solid rgba(176,58,46,0.25); }
+  .verdict-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .verdict-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.75);
+  }
+  .verdict-text strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* SECONDARY CARDS */
+  .cards-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .data-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+  }
+  .data-card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .data-card-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+    transition: all 0.2s;
+  }
+  .data-card-sub {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 3px;
+  }
+
+  /* FLUJO CHART */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .chart-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 80px;
+  }
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .bar-fill {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    min-height: 3px;
+  }
+  .bar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--ink3);
+    text-align: center;
+  }
+  .chart-legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--ink2);
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  /* CTA */
+  .cta-block {
+    background: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: var(--radius-sm);
+    padding: 20px 20px 22px;
+    text-align: center;
+  }
+  .cta-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 4px;
+    line-height: 1.55;
+  }
+  .cta-btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: -0.2px;
+    transition: transform 0.1s, opacity 0.1s;
+    width: 100%;
+  }
+  .cta-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .cta-btn:active { transform: translateY(0); }
+
+  /* MOBILE */
+  @media (max-width: 720px) {
+    .topbar { padding: 12px 16px; }
+    .hero { padding: 28px 16px 20px; }
+    .calc-shell {
+      grid-template-columns: 1fr;
+      padding: 0 16px 60px;
+    }
+    .results-panel { position: static; }
+    .main-metric-value { font-size: 40px; }
+  }
+
+  /* ANIMATE VALUES */
+  .flash {
+    animation: flash-in 0.25s ease;
+  }
+  @keyframes flash-in {
+    0% { opacity: 0.3; transform: translateY(-3px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── PLANES GRID ── */
+  .planes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 32px 0 16px;
+    width: 100%;
+    align-items: start;
+  }
+  .plan-card {
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 9px;
+    padding: 20px 12px 14px;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: center;
+    position: relative;
+    background: rgba(255,255,255,0.04);
+    margin-top: 10px;
+  }
+  .plan-card.plan-featured {
+    margin-top: 0;
+    padding-top: 24px;
+  }
+  .plan-card:hover { border-color: var(--gold); background: rgba(184,150,60,0.08); }
+  .plan-card.plan-featured { border-color: var(--gold); background: rgba(184,150,60,0.1); }
+  .plan-badge {
+    position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+    background: var(--gold); color: var(--navy);
+    font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap; font-family: 'Space Grotesk', sans-serif;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    z-index: 2;
+  }
+  .plan-card .plan-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px;
+  }
+  .plan-card .plan-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -1px;
+    margin-bottom: 5px;
+  }
+  .plan-card.plan-featured .plan-price { color: var(--gold); }
+  .plan-card .plan-features {
+    font-size: 10.5px; color: rgba(255,255,255,0.45); line-height: 1.6;
+  }
+  .cta-fine {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 10px;
+  }
+  .cta-fine span { display: flex; align-items: center; gap: 3px; }
+  @media(max-width:520px){
+    .planes-grid { grid-template-columns: 1fr; }
+    .plan-card { margin-top: 14px; }
+    .plan-card.plan-featured { margin-top: 14px; }
+    .cta-fine { flex-direction: column; align-items: center; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <a href="/" class="logo-row" style="text-decoration:none;cursor:pointer;">
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <svg viewBox="0 0 160 18" height="15" xmlns="http://www.w3.org/2000/svg">
+        <line x1="6" y1="1" x2="6" y2="16" stroke="#B8963C" stroke-width="1.5"/>
+        <text x="12" y="13" font-family="Playfair Display,serif" font-weight="700" font-size="11" fill="#FFFFFF" letter-spacing="0.1">VÉRTICE ANALÍTICA</text>
+      </svg>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="width:5px;height:5px;border-radius:50%;background:#B8963C;flex-shrink:0;"></span>
+        <span style="font-family:Space Grotesk,sans-serif;font-size:11px;font-weight:700;color:#B8963C;letter-spacing:0.05em;">WATIO</span>
+      </div>
+    </div>
+  </a>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="/" class="topbar-back">← Volver a VÉRTICE</a>
+    <div class="topbar-tag">WATIO · Inteligencia Financiera Aplicada</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">// inteligencia financiera aplicada</div>
+  <h1 class="hero-title">
+    ¿La energía solar te conviene<br>
+    <span class="hl">con números reales?</span>
+  </h1>
+  <p class="hero-sub">
+    Ingresa tu consumo eléctrico. En 60 segundos obtienes TIR, payback y ahorro proyectado, calculados con metodología de análisis financiero especializado.
+  </p>
+</section>
+
+<!-- CALCULADORA -->
+<main class="calc-shell">
+
+  <!-- COLUMNA IZQUIERDA: INPUTS -->
+  <div>
+    <!-- PANEL 1: CONSUMO -->
+    <div class="panel" style="margin-bottom: 16px;">
+      <div class="panel-header">
+        <div class="panel-header-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h14a1 1 0 001-1v-4M9 4V3M9 4h6M15 4V3M15 4h3a1 1 0 011 1v3M9 9h6M9 13h4"/></svg>
+        </div>
+        <span class="panel-title">Tu consumo eléctrico</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="field-group">
+          <div class="field-label">
+            Factura eléctrica mensual promedio
+            <span class="hint">en tu planilla EEQ</span>
+          </div>
+          <div class="slider-main-value">$<span id="v-factura">85</span></div>
+          <input type="range" id="sl-factura" min="20" max="400" step="5" value="85" oninput="syncSlider('factura'); calcular()">
+          <div class="slider-value-row"><span>$20</span><span>$400+</span></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Consumo mensual estimado
+            <span class="hint">kWh/mes</span>
+          </div>
+          <div class="slider-main-value"><span id="v-kwh">680</span> kWh</div>
+          <input type="range" id="sl-kwh" min="100" max="2000" step="50" value="680" oninput="syncSlider('kwh'); calcular()">
+          <div class="slider-value-row"><span>100</span><span>2.000+</span></div>
+        </div>
+
+        <hr class="field-divider">
+
+        <div class="field-group">
+          <div class="field-label">Ciudad / zona</div>
+          <div class="btn-group" id="ciudad-group">
+            <button class="btn-opt active" onclick="setOpt('ciudad',this,'quito'); calcular()">Quito</button>
+            <button class="btn-opt" onclick="setOpt('ciudad',this,'guayaquil'); calcular()">Guayaquil</button>
+            <button class="btn-opt" onclick="setOpt('ciudad',this,'cuenca'); calcular()">Cuenca</button>
+            <button class="btn-opt" onclick="setOpt('ciudad',this,'manta'); calcular()">Costa / Manta</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Potencia del panel <span class="hint">Watts por panel</span></div>
+          <div class="btn-group" id="panel-g">
+            <button class="btn-opt" data-val='400' onclick="setOpt('panel',this,'400');calcular()">400W</button>
+            <button class="btn-opt" data-val='550' onclick="setOpt('panel',this,'550');calcular()">550W</button>
+            <button class="btn-opt active" data-val='600' onclick="setOpt('panel',this,'600');calcular()">600W</button>
+            <button class="btn-opt" data-val='700' onclick="setOpt('panel',this,'700');calcular()">700W</button>
+            <button class="btn-opt" data-val='1000' onclick="setOpt('panel',this,'1000');calcular()">1.000W</button>
+          </div>
+        </div>
+
+        <div class="field-group" id="tributario-row" style="display:none;">
+          <div style="background:rgba(46,158,107,0.1);border:1px solid rgba(46,158,107,0.25);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:12px;font-weight:600;color:#2E9E6B;margin-bottom:3px;">✓ Beneficio tributario aplicado</div>
+            <div style="font-size:11.5px;color:var(--ink2);line-height:1.55;">Deducción del 22% sobre la inversión como gasto deducible de IR (Ley de Fomento Ambiental Ecuador). Reduce el costo efectivo del sistema para empresas.</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Tipo de instalación
+          </div>
+          <div class="btn-group" id="tipo-group">
+            <button class="btn-opt active" onclick="setOpt('tipo',this,'residencial'); calcular()">Residencial</button>
+            <button class="btn-opt" onclick="setOpt('tipo',this,'comercial'); calcular()">Comercial</button>
+            <button class="btn-opt" onclick="setOpt('tipo',this,'pyme'); calcular()">PYME</button>
+            <button class="btn-opt" onclick="setOpt('tipo',this,'industrial'); calcular()">Industrial</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PANEL 2: SISTEMA -->
+    <div class="panel" style="margin-bottom: 16px;">
+      <div class="panel-header">
+        <div class="panel-header-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 3l9 4.5v9L12 21l-9-4.5v-9L12 3zM12 12l9-4.5M12 12v9M12 12L3 7.5"/></svg>
+        </div>
+        <span class="panel-title">Sistema solar propuesto</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="field-group">
+          <div class="field-label">
+            Porcentaje de consumo a cubrir
+            <span class="hint" id="hint-cobertura">cobertura del sistema</span>
+          </div>
+          <div class="slider-main-value"><span id="v-cobertura">80</span>%</div>
+          <input type="range" id="sl-cobertura" min="30" max="100" step="5" value="80" oninput="syncSlider('cobertura'); calcular()">
+          <div class="slider-value-row"><span>30%</span><span>100%</span></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Forma de pago
+          </div>
+          <div class="btn-group" id="financiamiento-group">
+            <button class="btn-opt active" onclick="setOpt('financiamiento',this,'contado'); calcular()">Al contado</button>
+            <button class="btn-opt" onclick="setOpt('financiamiento',this,'credito'); calcular()">Crédito bancario</button>
+            <button class="btn-opt" onclick="setOpt('financiamiento',this,'cfn'); calcular()">CFN / BanEcuador</button>
+          </div>
+        </div>
+
+        <div id="credito-options" style="display:none; margin-top: 14px;">
+          <div class="field-group">
+            <div class="field-label">
+              Tasa de interés anual
+              <span class="hint" id="hint-tasa">% anual</span>
+            </div>
+            <div class="slider-main-value"><span id="v-tasa">10.5</span>%</div>
+            <input type="range" id="sl-tasa" min="5" max="18" step="0.5" value="10.5" oninput="syncSlider('tasa'); calcular()">
+            <div class="slider-value-row"><span>5%</span><span>18%</span></div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Plazo del crédito</div>
+            <div class="btn-group" id="plazo-group">
+              <button class="btn-opt active" onclick="setOpt('plazo',this,'3'); calcular()">3 años</button>
+              <button class="btn-opt" onclick="setOpt('plazo',this,'5'); calcular()">5 años</button>
+              <button class="btn-opt" onclick="setOpt('plazo',this,'7'); calcular()">7 años</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Incremento anual esperado de la tarifa eléctrica
+          </div>
+          <div class="slider-main-value"><span id="v-incremento">4</span>% anual</div>
+          <input type="range" id="sl-incremento" min="0" max="12" step="1" value="4" oninput="syncSlider('incremento'); calcular()">
+          <div class="slider-value-row"><span>0%</span><span>12%</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div style="font-size: 11px; color: var(--ink3); line-height: 1.6; padding: 0 4px;">
+      Tarifas EEQ/CNEL por tipo de cliente (2025), precios de instalación de mercado en Quito y datos de radiación NASA PVGIS. El beneficio tributario aplica a empresas bajo la Ley de Fomento Ambiental. Análisis orientativo — el informe WATIO valida los números con su cotización real.
+    </div>
+  </div>
+
+  <!-- COLUMNA DERECHA: RESULTADOS -->
+  <div class="results-panel">
+
+    <!-- TICKER PRINCIPAL -->
+    <div class="ticker-panel">
+      <div class="ticker-header">
+        <span class="ticker-title">// estimación preliminar</span>
+        <div class="live-dot"></div>
+      </div>
+      <div class="ticker-body">
+
+        <div class="main-metric">
+          <div class="main-metric-label">ahorro mensual estimado</div>
+          <div class="main-metric-value" id="r-ahorro-mes">$68</div>
+          <div class="main-metric-sub" id="r-pct-factura">80% de tu factura actual</div>
+          <div id="r-tarifa-tipo" style="font-size:10.5px;color:rgba(255,255,255,0.35);margin-top:4px;letter-spacing:0.02em;"></div>
+        </div>
+
+        <div class="metrics-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="metric-cell">
+            <div class="metric-cell-label">payback estimado</div>
+            <div class="metric-cell-value accent" id="r-payback">5.2 años</div>
+            <div class="metric-cell-sub">recuperación de inversión</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-cell-label">sistema requerido</div>
+            <div class="metric-cell-value" id="r-kwp">5.8 kWp</div>
+            <div class="metric-cell-sub" id="r-paneles">~10 paneles 600W</div>
+          </div>
+        </div>
+
+        <div class="verdict-bar good" id="verdict-bar">
+          <div class="verdict-icon" id="verdict-icon">✅</div>
+          <div class="verdict-text" id="verdict-text">
+            <strong>Resultado preliminar favorable.</strong> El informe completo incluye TIR, VAN, comparación de escenarios y validación con cotización real.
+          </div>
+        </div>
+
+        <!-- TEASER BLOQUEADO -->
+        <div style="margin-top:14px;padding:14px 16px;background:rgba(184,150,60,0.08);border:1px dashed rgba(184,150,60,0.35);border-radius:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:15px;">🔒</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;color:var(--gold);">TIR, VAN y flujo a 20 años</span>
+          </div>
+          <p style="font-size:11.5px;color:rgba(255,255,255,0.45);line-height:1.55;">
+            Disponibles en el informe completo, junto con el análisis de financiamiento y la comparación de hasta 3 cotizaciones de instaladores.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- INVERSIÓN ESTIMADA -->
+    <div class="cards-row" style="grid-template-columns: 1fr;">
+      <div class="data-card">
+        <div class="data-card-label">inversión estimada del sistema</div>
+        <div class="data-card-value" id="r-inversion">$8.160</div>
+        <div class="data-card-sub">Sistema + instalación · precio referencial de mercado</div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO DE FLUJO ACUMULADO (vista previa) -->
+    <div class="chart-card">
+      <div class="chart-title">// tendencia de flujo acumulado — vista previa</div>
+      <div class="chart-bars" id="chart-bars"></div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#B8963C;"></span>flujo positivo</span>
+        <span><span class="legend-dot" style="background:#3A4A66;"></span>flujo negativo</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <p class="cta-text">
+        Esta es tu estimación base. El <strong>informe completo WATIO</strong> incluye 3 escenarios de sensibilidad, comparación de cotizaciones de instaladores en Quito y estructura de financiamiento óptima.
+      </p>
+      <!-- PLANES -->
+      <div class="planes-grid">
+        <div class="plan-card" onclick="irFormulario('basico')">
+          <div class="plan-name">Básico</div>
+          <div class="plan-price">$150</div>
+          <div class="plan-features">Informe 2 páginas · 2 escenarios<br>TIR · VAN · Payback · 72h</div>
+        </div>
+        <div class="plan-card plan-featured" onclick="irFormulario('estandar')">
+          <div class="plan-badge">⭐ Recomendado</div>
+          <div class="plan-name">Estándar</div>
+          <div class="plan-price">$250</div>
+          <div class="plan-features">Todo lo básico + comparación<br>3 cotizaciones · Llamada 30 min · 48h</div>
+        </div>
+        <div class="plan-card" onclick="irFormulario('premium')">
+          <div class="plan-name">Premium</div>
+          <div class="plan-price">$380</div>
+          <div class="plan-features">Todo lo estándar + financiamiento<br>estructurado · Seguimiento 3 meses</div>
+        </div>
+      </div>
+
+      <button class="cta-btn" onclick="irFormulario('estandar')">
+        Solicitar análisis completo →
+      </button>
+      <p class="cta-fine">
+        <span>✓ Análisis financiero especializado</span>
+        <span>✓ Sin comisión de instaladores</span>
+        <span>✓ Actualización gratuita si precio difiere &gt;15%</span>
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<!-- ════════════════════════════════════════════════════════
+     OVERLAY DE CONFIRMACIÓN DE PAGO — PayPhone redirige aquí
+     con ?id=...&clientTransactionId=... después del pago.
+     ════════════════════════════════════════════════════════ -->
+<div id="pp-confirm-overlay" style="display:none; position:fixed; inset:0; background:rgba(11,31,58,0.97); z-index:9999; align-items:center; justify-content:center; flex-direction:column; padding:24px; text-align:center;">
+  <div style="max-width:420px;">
+    <div id="pp-confirm-spinner" style="width:48px; height:48px; border:3px solid rgba(184,150,60,0.3); border-top-color:#B8963C; border-radius:50%; margin:0 auto 24px; animation:pp-spin 0.9s linear infinite;"></div>
+    <h2 id="pp-confirm-titulo" style="color:#FFFFFF; font-family:'Space Grotesk',sans-serif; font-size:22px; margin-bottom:12px;">Confirmando su pago…</h2>
+    <p id="pp-confirm-texto" style="color:rgba(255,255,255,0.7); font-family:'Inter',sans-serif; font-size:15px; line-height:1.6;">
+      Estamos verificando su transacción con PayPhone y preparando su análisis. Esto toma unos segundos, por favor no cierre esta ventana.
+    </p>
+  </div>
+</div>
+<style>
+  @keyframes pp-spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+  // ─── CONFIRMACIÓN DE PAGO PAYPHONE (fase Confirm) ───
+  // Si la URL trae ?id=...&clientTransactionId=..., significa que PayPhone
+  // acaba de redirigir aquí después de un pago. Confirmamos con el backend
+  // antes de que el cliente vea nada más de la página.
+  (function manejarRetornoDePayphone() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const clientTransactionId = params.get('clientTransactionId');
+
+    if (!id || !clientTransactionId) return; // no es un retorno de pago, página normal
+
+    const APPS_SCRIPT_URL_PAGO = 'https://script.google.com/macros/s/AKfycby0p1D-LoAQWPELtPzMgURPmehzG9toz6iOcCsYu6RTPPknQm2AS7BcU16wXUB3ZKoK/exec';
+
+    const overlay = document.getElementById('pp-confirm-overlay');
+    const titulo = document.getElementById('pp-confirm-titulo');
+    const texto = document.getElementById('pp-confirm-texto');
+    const spinner = document.getElementById('pp-confirm-spinner');
+    overlay.style.display = 'flex';
+
+    fetch(APPS_SCRIPT_URL_PAGO, {
+      method: 'POST',
+      body: new URLSearchParams({ accion: 'confirmar_pago', id, clientTransactionId })
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        spinner.style.display = 'none';
+        if (data.success) {
+          titulo.textContent = '¡Pago confirmado!';
+          texto.innerHTML = 'Su análisis está siendo generado. Le enviaremos el informe completo a su correo en los próximos minutos, una vez revisado por nuestro equipo.<br><br><strong>Referencia:</strong> ' + clientTransactionId;
+        } else if (data.aprobado === false) {
+          titulo.textContent = 'Pago no completado';
+          texto.textContent = data.mensaje || 'El pago no pudo ser aprobado. Si el cargo se realizó en su tarjeta, contáctenos por WhatsApp.';
+        } else {
+          titulo.textContent = 'Su pago fue recibido';
+          texto.textContent = 'Hubo un detalle al generar el informe automáticamente, pero nuestro equipo ya fue notificado y dará seguimiento manual a su solicitud.';
+        }
+      })
+      .catch(() => {
+        spinner.style.display = 'none';
+        titulo.textContent = 'Su pago fue recibido';
+        texto.textContent = 'Estamos procesando su solicitud. Si no recibe noticias en los próximos minutos, contáctenos por WhatsApp con su referencia: ' + clientTransactionId;
+      });
+  })();
+
+  // ─── STATE ───
+  const state = {
+    factura: 85,
+    kwh: 680,
+    cobertura: 80,
+    incremento: 4,
+    tasa: 10.5,
+    ciudad: 'quito',
+    tipo: 'residencial',
+    financiamiento: 'contado',
+    plazo: '3'
+  };
+
+  // ─── RADIACIÓN POR CIUDAD (kWh/m²/día promedio anual)
+  const radiacion = { quito: 4.8, guayaquil: 5.0, cuenca: 4.6, manta: 5.4 };
+
+  // ─── PRECIO POR KWP (instalado, incluyendo equipo) $/kWp
+
+
+  // ─── TARIFA EEQ POR TIPO
+  // Tarifas reales Ecuador 2025 por tipo de cliente
+  const tarifa = {
+    residencial: 0.1061,   // EEQ residencial vigente
+    comercial:   0.098,    // Comercial bajo voltaje promedio
+    pyme:        0.093,    // PYME / comercial medio voltaje
+    industrial:  0.078,    // Industrial alto voltaje
+  };
+
+  // Degradación y mantenimiento por tipo
+  window.degradacion = { residencial: 0.005, comercial: 0.006, pyme: 0.006, industrial: 0.007 };
+  window.mantenimiento = { residencial: 0.005, comercial: 0.008, pyme: 0.008, industrial: 0.010 };
+
+  // Beneficio tributario: deducción IR para empresas (22% de la inversión)
+  // Solo aplica a comercial, pyme e industrial
+  window.beneficioTributario = { residencial: 0, comercial: 0.22, pyme: 0.22, industrial: 0.22 };
+
+  // Precio por kWp instalado (incluye panel + inversor + estructura + instalación)
+  const precioPorKwp = { residencial: 980, comercial: 900, pyme: 860, industrial: 780 };
+
+  // Potencia de panel por defecto según tipo
+  const panelWatts = { residencial: 600, comercial: 700, pyme: 700, industrial: 1000 };
+
+  // ─── SYNC SLIDERS ───
+  function syncSlider(id) {
+    const val = document.getElementById('sl-' + id).value;
+    state[id] = parseFloat(val);
+    const display = document.getElementById('v-' + id);
+    if (id === 'tasa') display.textContent = parseFloat(val).toFixed(1);
+    else display.textContent = val;
+  }
+
+  // ─── OPT BUTTONS ───
+  function setOpt(group, btn, val) {
+    document.querySelectorAll(`#${group}-group .btn-opt`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state[group] = val;
+
+    // Crédito
+    if (group === 'financiamiento') {
+      document.getElementById('credito-options').style.display =
+        (val === 'credito' || val === 'cfn') ? 'block' : 'none';
+      if (val === 'cfn') {
+        state.tasa = 6.5;
+        document.getElementById('sl-tasa').value = 6.5;
+        document.getElementById('v-tasa').textContent = '6.5';
+      } else if (val === 'credito') {
+        state.tasa = 10.5;
+        document.getElementById('sl-tasa').value = 10.5;
+        document.getElementById('v-tasa').textContent = '10.5';
+      }
+    }
+
+    // Tipo — ajustar panel por defecto y mostrar beneficio tributario
+    if (group === 'tipo') {
+      const defPanel = panelWatts[val] || 600;
+      state.tipo = val;
+      // Actualizar botones de panel
+      document.querySelectorAll('#panel-g .btn-opt').forEach(b => {
+        const bVal = b.getAttribute('data-val') || b.textContent.replace('W','').replace('.','');
+        b.classList.toggle('active', parseInt(bVal) === defPanel);
+      });
+      state.panel = String(defPanel);
+      // Mostrar/ocultar aviso tributario
+      const tr = document.getElementById('tributario-row');
+      if (tr) tr.style.display = val !== 'residencial' ? 'block' : 'none';
+    }
+
+    // Panel — actualizar state
+    if (group === 'panel') {
+      state.panel = val;
+    }
+  }
+
+  // ─── CORE CALCULATION ───
+  function calcular() {
+    const rad = radiacion[state.ciudad];
+    const precioKwp = precioPorKwp[state.tipo];
+    const tarifaKwh = tarifa[state.tipo] || 0.1061;
+
+    // Sistema requerido
+    const kwhCubrir = state.kwh * (state.cobertura / 100);
+    const kwp = kwhCubrir / (rad * 30 * 0.78); // factor de pérdidas 0.78
+    const kwpRedondeado = Math.round(kwp * 10) / 10;
+    const panelW = parseInt(state.panel) || 600;
+    const nPaneles = Math.ceil(kwp / (panelW / 1000));
+    const inversion = Math.round(kwp * precioKwp);
+
+    // Ahorro mensual año 1
+    const ahorroMes1 = Math.round(kwhCubrir * (tarifa[state.tipo] || 0.1061));
+    const pctFactura = Math.round((ahorroMes1 / state.factura) * 100);
+
+    // Flujo anual dinámico según tipo de cliente
+    const degRate  = (window.degradacion || {})[state.tipo] || 0.005;
+    const mantRate = (window.mantenimiento || {})[state.tipo] || 0.005;
+    const tribPctCur = (window.beneficioTributario || {})[state.tipo] || 0;
+    const invBrutoCur = Math.round(kwp * (precioPorKwp[state.tipo] || 980));
+    const descTribCur = Math.round(invBrutoCur * tribPctCur);
+    const invEfectiva = invBrutoCur - descTribCur;
+    const mantenimiento = invBrutoCur * mantRate;
+
+    let flujoAcumulado = -invEfectiva;
+    let paybackAnio = null;
+    let flujos = [-invEfectiva];
+    let flujoAnualArr = [];
+
+    for (let y = 1; y <= 20; y++) {
+      const factorTarifa = Math.pow(1 + state.incremento / 100, y - 1);
+      const factorDegradacion = Math.pow(1 - degRate, y - 1);
+      const ahorroAnio = ahorroMes1 * 12 * factorTarifa * factorDegradacion;
+
+      // Si hay financiamiento, restar cuota
+      let cuota = 0;
+      if (state.financiamiento !== 'contado') {
+        const n = parseInt(state.plazo) * 12;
+        const r = (state.tasa / 100) / 12;
+        const cuotaMensual = inversion * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+        cuota = y <= parseInt(state.plazo) ? cuotaMensual * 12 : 0;
+      }
+
+      const flujoNeto = ahorroAnio - mantenimiento - cuota;
+      flujoAnualArr.push(flujoNeto);
+      flujoAcumulado += flujoNeto;
+      flujos.push(flujoAcumulado);
+
+      if (paybackAnio === null && flujoAcumulado >= 0) {
+        // Interpolación lineal para payback preciso
+        const prevAcum = flujos[y - 1];
+        const fraccion = -prevAcum / flujoNeto;
+        paybackAnio = (y - 1) + fraccion;
+      }
+    }
+
+    // TIR (Newton-Raphson)
+    const tir = calcTIR(flujoAnualArr, invEfectiva);
+
+    // VAN al 8%
+    let van = -invEfectiva;
+    const tasaDesc = 0.08;
+    flujoAnualArr.forEach((f, i) => {
+      van += f / Math.pow(1 + tasaDesc, i + 1);
+    });
+
+    const ahorro20 = flujos[20];
+
+    // ─── UPDATE UI (solo elementos que existen en la versión simplificada) ───
+    animateValue('r-payback', paybackAnio ? paybackAnio.toFixed(1) + ' años' : '>20 años');
+    animateValue('r-inversion', formatCurrency(invEfectiva));
+    animateValue('r-ahorro-mes', formatCurrency(ahorroMes1));
+    animateValue('r-kwp', kwpRedondeado + ' kWp');
+    animateValue('r-paneles', '~' + nPaneles + ' paneles ' + panelW + 'W');
+
+    // TIR y VAN se calculan igual (necesarios para el veredicto y el chart)
+    // pero ya no se muestran en pantalla — quedan reservados para el informe pagado
+
+    // Actualizar tarifa display y nota tributaria
+    const tarifaEl2 = document.getElementById('r-tarifa-tipo');
+    if (tarifaEl2) {
+      const tipoActual = state.tipo || 'residencial';
+      const tarActual  = tarifa[tipoActual] || 0.1061;
+      tarifaEl2.textContent = 'Tarifa ' + tipoActual + ': $' + tarActual.toFixed(4) + '/kWh';
+    }
+    const tribEl = document.getElementById('r-trib-note');
+    if (tribEl) {
+      const tipoBen = state.tipo || 'residencial';
+      const tribPct2 = beneficioTributario[tipoBen] || 0;
+      if (tribPct2 > 0) {
+        const invBruto2 = Math.round(kwp * (precioPorKwp[tipoBen] || 980));
+        const desc2 = Math.round(invBruto2 * tribPct2);
+        tribEl.style.display = 'block';
+        tribEl.textContent = '✓ Deducción IR 22% aplicada (-$' + desc2.toLocaleString('es-EC') + ')';
+      } else { tribEl.style.display = 'none'; }
+    }
+
+    const pctFacturaEl = document.getElementById('r-pct-factura');
+    if (pctFacturaEl) pctFacturaEl.textContent = Math.min(pctFactura, 100) + '% de tu factura actual';
+
+    // Veredicto (sigue usando TIR/VAN internamente, sin mostrarlos)
+    updateVeredicto(tir, paybackAnio, van, state.financiamiento);
+
+    // Chart (vista previa, sin valores en $)
+    renderChart(flujos);
+  }
+
+  function calcTIR(flujos, inversion) {
+    // Busca TIR por bisección
+    let lo = -0.99, hi = 10.0;
+    for (let iter = 0; iter < 100; iter++) {
+      const mid = (lo + hi) / 2;
+      let npv = -inversion;
+      flujos.forEach((f, i) => { npv += f / Math.pow(1 + mid, i + 1); });
+      if (Math.abs(npv) < 0.01) return mid * 100;
+      if (npv > 0) lo = mid; else hi = mid;
+    }
+    return ((lo + hi) / 2) * 100;
+  }
+
+  function updateVeredicto(tir, payback, van, financiamiento) {
+    const bar = document.getElementById('verdict-bar');
+    const icon = document.getElementById('verdict-icon');
+    const text = document.getElementById('verdict-text');
+
+    if (tir !== null && tir >= 15 && van > 0 && payback && payback <= 7) {
+      bar.className = 'verdict-bar good';
+      icon.textContent = '✅';
+      text.innerHTML = '<strong>Proyecto financieramente sólido.</strong> TIR de ' + tir.toFixed(1) + '% supera el costo de oportunidad en Ecuador. Inversión justificada.';
+    } else if (tir !== null && tir >= 8 && van > 0) {
+      bar.className = 'verdict-bar warn';
+      icon.textContent = '⚠️';
+      text.innerHTML = '<strong>Viable con reservas.</strong> TIR de ' + tir.toFixed(1) + '% es positiva pero moderada. Evaluar alternativas de financiamiento para mejorar retorno.';
+    } else {
+      bar.className = 'verdict-bar bad';
+      icon.textContent = '❌';
+      text.innerHTML = '<strong>No recomendado en este escenario.</strong> El costo del financiamiento o la baja cobertura comprometen el retorno. Revisa los parámetros.';
+    }
+  }
+
+  function renderChart(flujos) {
+    const container = document.getElementById('chart-bars');
+    const years = [1, 3, 5, 7, 10, 12, 15, 17, 20];
+    const vals = years.map(y => flujos[y] || 0);
+    const maxAbs = Math.max(...vals.map(Math.abs), 1);
+
+    container.innerHTML = '';
+    years.forEach((y, i) => {
+      const v = vals[i];
+      const pct = Math.abs(v) / maxAbs;
+      const h = Math.max(Math.round(pct * 68), 4);
+      const isPos = v >= 0;
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      col.innerHTML = `
+        <div class="bar-fill" style="
+          height: ${h}px;
+          background: ${isPos ? '#B8963C' : '#3A4A66'};
+          opacity: ${isPos ? 0.85 : 0.5};
+        "></div>
+        <div class="bar-label">A${y}</div>
+      `;
+      container.appendChild(col);
+    });
+  }
+
+  function formatCurrency(val) {
+    if (val === null || isNaN(val)) return 'N/A';
+    const prefix = val < 0 ? '-$' : '$';
+    return prefix + Math.abs(Math.round(val)).toLocaleString('es-EC');
+  }
+
+  function animateValue(id, newVal) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = newVal;
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  }
+
+  function irFormulario(plan) {
+    // Pasar datos de la calculadora al formulario via URL params
+    const params = new URLSearchParams({
+      plan:     plan || 'estandar',
+      ciudad:   state.ciudad || 'quito',
+      tipo:     state.tipo || 'residencial',
+      factura:  state.factura,
+      kwh:      state.kwh,
+      payback:  document.getElementById('r-payback')?.textContent || '',
+    });
+    window.location.href = '/watio/solicitar/?' + params.toString();
+  }
+
+  function solicitarInforme() {
+    const payback = document.getElementById('r-payback')?.textContent || '';
+    const kwp = document.getElementById('r-kwp')?.textContent || '';
+    const inv = document.getElementById('r-inversion')?.textContent || '';
+    const msg = `Hola WATIO, me interesa el informe completo.\n\nMis datos:\n- Factura mensual: $${state.factura}\n- Consumo: ${state.kwh} kWh/mes\n- Ciudad: ${state.ciudad}\n- Sistema calculado: ${kwp} / Inversión: ${inv}\n- Payback estimado: ${payback}\n\nQuisiera recibir el análisis detallado con cotizaciones de instaladores.`;
+    const url = 'https://wa.me/593985365281?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank');
+  }
+
+  // ─── INIT ───
+  calcular();
+</script>
+</body>
+</html>
