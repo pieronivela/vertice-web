@@ -903,68 +903,7 @@
   </div>
 </main>
 
-<!-- ════════════════════════════════════════════════════════
-     OVERLAY DE CONFIRMACIÓN DE PAGO — PayPhone redirige aquí
-     con ?id=...&clientTransactionId=... después del pago.
-     ════════════════════════════════════════════════════════ -->
-<div id="pp-confirm-overlay" style="display:none; position:fixed; inset:0; background:rgba(11,31,58,0.97); z-index:9999; align-items:center; justify-content:center; flex-direction:column; padding:24px; text-align:center;">
-  <div style="max-width:420px;">
-    <div id="pp-confirm-spinner" style="width:48px; height:48px; border:3px solid rgba(184,150,60,0.3); border-top-color:#B8963C; border-radius:50%; margin:0 auto 24px; animation:pp-spin 0.9s linear infinite;"></div>
-    <h2 id="pp-confirm-titulo" style="color:#FFFFFF; font-family:'Space Grotesk',sans-serif; font-size:22px; margin-bottom:12px;">Confirmando su pago…</h2>
-    <p id="pp-confirm-texto" style="color:rgba(255,255,255,0.7); font-family:'Inter',sans-serif; font-size:15px; line-height:1.6;">
-      Estamos verificando su transacción con PayPhone y preparando su análisis. Esto toma unos segundos, por favor no cierre esta ventana.
-    </p>
-  </div>
-</div>
-<style>
-  @keyframes pp-spin { to { transform: rotate(360deg); } }
-</style>
-
 <script>
-  // ─── CONFIRMACIÓN DE PAGO PAYPHONE (fase Confirm) ───
-  // Si la URL trae ?id=...&clientTransactionId=..., significa que PayPhone
-  // acaba de redirigir aquí después de un pago. Confirmamos con el backend
-  // antes de que el cliente vea nada más de la página.
-  (function manejarRetornoDePayphone() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    const clientTransactionId = params.get('clientTransactionId');
-
-    if (!id || !clientTransactionId) return; // no es un retorno de pago, página normal
-
-    const APPS_SCRIPT_URL_PAGO = 'https://script.google.com/macros/s/AKfycby0p1D-LoAQWPELtPzMgURPmehzG9toz6iOcCsYu6RTPPknQm2AS7BcU16wXUB3ZKoK/exec';
-
-    const overlay = document.getElementById('pp-confirm-overlay');
-    const titulo = document.getElementById('pp-confirm-titulo');
-    const texto = document.getElementById('pp-confirm-texto');
-    const spinner = document.getElementById('pp-confirm-spinner');
-    overlay.style.display = 'flex';
-
-    fetch(APPS_SCRIPT_URL_PAGO, {
-      method: 'POST',
-      body: new URLSearchParams({ accion: 'confirmar_pago', id, clientTransactionId })
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        spinner.style.display = 'none';
-        if (data.success) {
-          titulo.textContent = '¡Pago confirmado!';
-          texto.innerHTML = 'Su análisis está siendo generado. Le enviaremos el informe completo a su correo en los próximos minutos, una vez revisado por nuestro equipo.<br><br><strong>Referencia:</strong> ' + clientTransactionId;
-        } else if (data.aprobado === false) {
-          titulo.textContent = 'Pago no completado';
-          texto.textContent = data.mensaje || 'El pago no pudo ser aprobado. Si el cargo se realizó en su tarjeta, contáctenos por WhatsApp.';
-        } else {
-          titulo.textContent = 'Su pago fue recibido';
-          texto.textContent = 'Hubo un detalle al generar el informe automáticamente, pero nuestro equipo ya fue notificado y dará seguimiento manual a su solicitud.';
-        }
-      })
-      .catch(() => {
-        spinner.style.display = 'none';
-        titulo.textContent = 'Su pago fue recibido';
-        texto.textContent = 'Estamos procesando su solicitud. Si no recibe noticias en los próximos minutos, contáctenos por WhatsApp con su referencia: ' + clientTransactionId;
-      });
-  })();
-
   // ─── STATE ───
   const state = {
     factura: 85,
@@ -1266,6 +1205,85 @@
 
   // ─── INIT ───
   calcular();
+</script>
+
+<!-- ════════════════════════════════════════════════════════
+     OVERLAY DE CONFIRMACIÓN DE PAGO
+     PayPhone redirige aquí con ?id=...&clientTransactionId=...
+     Detecta automáticamente si es WATIO o BANKABLE por el prefijo
+     del clientTransactionId y llama a la acción correcta.
+     ════════════════════════════════════════════════════════ -->
+<div id="pp-confirm-overlay" style="display:none; position:fixed; inset:0; background:rgba(11,31,58,0.97); z-index:9999; align-items:center; justify-content:center; flex-direction:column; padding:24px; text-align:center;">
+  <div style="max-width:440px;">
+    <div id="pp-confirm-spinner" style="width:48px; height:48px; border:3px solid rgba(184,150,60,0.3); border-top-color:#B8963C; border-radius:50%; margin:0 auto 24px; animation:pp-spin 0.9s linear infinite;"></div>
+    <h2 id="pp-confirm-titulo" style="color:#FFFFFF; font-family:'Space Grotesk',sans-serif; font-size:22px; margin-bottom:12px;">Confirmando su pago…</h2>
+    <p id="pp-confirm-texto" style="color:rgba(255,255,255,0.7); font-family:'Inter',sans-serif; font-size:15px; line-height:1.6;">
+      Estamos verificando su transacción. Por favor no cierre esta ventana.
+    </p>
+  </div>
+</div>
+<style>
+  @keyframes pp-spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+  (function manejarRetornoDePago() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const clientTransactionId = params.get('clientTransactionId');
+
+    if (!id || !clientTransactionId) return; // carga normal, no retorno de pago
+
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0p1D-LoAQWPELtPzMgURPmehzG9toz6iOcCsYu6RTPPknQm2AS7BcU16wXUB3ZKoK/exec';
+
+    // Detectar producto por prefijo del clientTransactionId
+    // WATIO genera refs como "WATIO-2025-XXXX" → normalizado empieza con "WATIO"
+    // BANKABLE genera refs como "BANKABLE-202XXXXX" → normalizado empieza con "BANKABLE"
+    const esBankable = clientTransactionId.toUpperCase().startsWith('BANKABLE') ||
+                       clientTransactionId.toUpperCase().startsWith('BNK');
+    const accion = esBankable ? 'confirmar_pago_bankable' : 'confirmar_pago';
+
+    const overlay  = document.getElementById('pp-confirm-overlay');
+    const titulo   = document.getElementById('pp-confirm-titulo');
+    const texto    = document.getElementById('pp-confirm-texto');
+    const spinner  = document.getElementById('pp-confirm-spinner');
+    overlay.style.display = 'flex';
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: new URLSearchParams({ accion, id, clientTransactionId })
+    })
+    .then(r => r.json())
+    .then(data => {
+      spinner.style.display = 'none';
+      if (data.success) {
+        if (esBankable) {
+          titulo.textContent = '¡Pago confirmado!';
+          texto.innerHTML =
+            'Hemos recibido su pago correctamente. Nuestro equipo revisará su información ' +
+            'y le enviará el diagnóstico crediticio BANKABLE a su correo en las próximas 24-48 horas.' +
+            '<br><br><strong>Referencia:</strong> ' + clientTransactionId;
+        } else {
+          titulo.textContent = '¡Pago confirmado!';
+          texto.innerHTML =
+            'Su análisis está siendo generado. Le enviaremos el informe completo a su correo ' +
+            'en los próximos minutos, una vez revisado por nuestro equipo.' +
+            '<br><br><strong>Referencia:</strong> ' + clientTransactionId;
+        }
+      } else if (data.aprobado === false) {
+        titulo.textContent = 'Pago no completado';
+        texto.textContent = data.mensaje || 'El pago no pudo ser aprobado. Si el cargo se realizó en su tarjeta, contáctenos por WhatsApp.';
+      } else {
+        titulo.textContent = 'Su pago fue recibido';
+        texto.textContent = 'Estamos procesando su solicitud. Si no recibe noticias pronto, contáctenos por WhatsApp con su referencia: ' + clientTransactionId;
+      }
+    })
+    .catch(() => {
+      spinner.style.display = 'none';
+      titulo.textContent = 'Su pago fue recibido';
+      texto.textContent = 'Estamos procesando su solicitud. Contáctenos por WhatsApp con su referencia: ' + clientTransactionId;
+    });
+  })();
 </script>
 </body>
 </html>
